@@ -16,71 +16,56 @@
             box-sizing: border-box; user-select: none; -webkit-user-select: none;
         }
         
-        .contenedor-busqueda { display: flex; gap: 10px; width: 100%; max-width: 400px; margin-bottom: 15px; margin-top: 10px; }
-        .input-busqueda {
-            flex-grow: 1; padding: 15px; border-radius: 25px; border: none;
-            background-color: #282828; color: white; font-size: 16px; outline: none;
-        }
-        .boton-lupa {
-            background-color: #E1306C; border: none; border-radius: 50%; width: 50px; height: 50px;
-            color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-        }
-        .boton-lupa:active { transform: scale(0.95); }
-        
-        .resultados { width: 100%; max-width: 400px; max-height: 180px; overflow-y: auto; margin-bottom: 20px; }
-        .item-cancion {
-            display: flex; align-items: center; padding: 10px; background-color: #181818; 
-            margin-bottom: 5px; border-radius: 10px; cursor: pointer;
-        }
-        .item-cancion:active { background-color: #282828; }
-        .item-imagen { width: 45px; height: 45px; border-radius: 5px; margin-right: 15px; object-fit: cover; }
-        .item-textos { display: flex; flex-direction: column; overflow: hidden; }
-        .item-titulo { font-size: 14px; font-weight: bold; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .item-artista { font-size: 12px; color: #A0A0A0; margin: 0; }
-
+        /* --- REPRODUCTOR PRINCIPAL --- */
         .reproductor {
             display: flex; flex-direction: column; align-items: center; width: 100%;
-            max-width: 400px; flex-grow: 1; justify-content: center;
+            max-width: 400px; justify-content: center; margin-top: 10px; margin-bottom: 20px;
         }
         .caratula {
-            width: 280px; height: 280px; border-radius: 20px; margin-bottom: 30px;
+            width: 200px; height: 200px; border-radius: 20px; margin-bottom: 15px;
             object-fit: cover; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
-        .titulo { font-size: 22px; font-weight: bold; margin: 0 0 5px 0; text-align: center; }
-        .artista { font-size: 14px; color: #A0A0A0; margin: 0 0 30px 0; text-align: center; }
+        .titulo { font-size: 20px; font-weight: bold; margin: 0 0 5px 0; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .artista { font-size: 14px; color: #A0A0A0; margin: 0 0 15px 0; text-align: center; }
         
-        .contenedor-progreso { width: 100%; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .contenedor-progreso { width: 100%; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .tiempo { font-size: 12px; color: #A0A0A0; width: 40px; text-align: center; }
-        .barra-progreso {
-            flex-grow: 1; appearance: none; height: 6px; background: #404040; border-radius: 5px; outline: none;
-        }
-        .barra-progreso::-webkit-slider-thumb {
-            appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #E1306C; cursor: pointer;
-        }
+        .barra-progreso { flex-grow: 1; appearance: none; height: 6px; background: #404040; border-radius: 5px; outline: none; }
+        .barra-progreso::-webkit-slider-thumb { appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #E1306C; cursor: pointer; }
 
-        .boton {
-            background-color: #E1306C; color: white; border: none; padding: 18px 50px;
-            border-radius: 30px; font-size: 20px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
-        }
-        .boton:active { transform: scale(0.95); }
+        .controles { display: flex; gap: 20px; align-items: center; }
+        .boton { background-color: #E1306C; color: white; border: none; padding: 12px 35px; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; }
         
-        /* Contenedor invisible para YouTube */
-        #reproductor-youtube { display: none; }
+        /* --- PESTAÑAS (TABS) --- */
+        .tabs { display: flex; width: 100%; max-width: 400px; margin-bottom: 10px; background: #181818; border-radius: 20px; overflow: hidden; }
+        .tab { flex: 1; text-align: center; padding: 12px; font-size: 14px; font-weight: bold; color: #A0A0A0; cursor: pointer; transition: 0.2s; }
+        .tab.activa { background-color: #282828; color: white; }
+
+        /* --- VISTAS (BUSCADOR Y BIBLIOTECA) --- */
+        .vista { display: none; width: 100%; max-width: 400px; flex-grow: 1; overflow-y: auto; flex-direction: column; }
+        .vista.activa { display: flex; }
+
+        .contenedor-busqueda { display: flex; gap: 10px; margin-bottom: 15px; }
+        .input-busqueda { flex-grow: 1; padding: 12px; border-radius: 20px; border: none; background-color: #282828; color: white; outline: none; }
+        .boton-lupa { background-color: #E1306C; border: none; border-radius: 50%; width: 45px; height: 45px; color: white; cursor: pointer; }
+
+        .lista-resultados { display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px; }
+        .item-cancion { display: flex; align-items: center; padding: 10px; background-color: #181818; border-radius: 10px; cursor: pointer; }
+        .item-cancion:active { background-color: #282828; }
+        .item-imagen { width: 40px; height: 40px; border-radius: 5px; margin-right: 15px; object-fit: cover; }
+        .item-textos { display: flex; flex-direction: column; overflow: hidden; flex-grow: 1; }
+        .item-titulo { font-size: 14px; font-weight: bold; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-artista { font-size: 12px; color: #A0A0A0; margin: 0; }
+        .icono-descarga { color: #E1306C; font-size: 18px; margin-left: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="contenedor-busqueda">
-        <input type="text" id="inputBusqueda" class="input-busqueda" placeholder="Buscar en YouTube...">
-        <button id="botonBuscar" class="boton-lupa">🔍</button>
-    </div>
-
-    <div id="contenedorResultados" class="resultados"></div>
-
+    <!-- REPRODUCTOR FIJO ARRIBA -->
     <div class="reproductor">
         <img id="caratula" class="caratula" src="logo.png" alt="Mayi Music">
         <h1 id="titulo" class="titulo">Mayi Music</h1>
-        <p id="artista" class="artista">Conectado a YouTube</p>
+        <p id="artista" class="artista">Encuentra y guarda tu música</p>
 
         <div class="contenedor-progreso">
             <span id="tiempoActual" class="tiempo">0:00</span>
@@ -88,47 +73,49 @@
             <span id="tiempoTotal" class="tiempo">0:00</span>
         </div>
 
-        <button id="botonReproducir" class="boton">Reproducir</button>
+        <div class="controles">
+            <button id="btnReproducir" class="boton">Play</button>
+        </div>
     </div>
 
-    <!-- Div donde YouTube cargará el video de forma invisible -->
-    <div id="reproductor-youtube"></div>
+    <!-- PESTAÑAS DE NAVEGACIÓN -->
+    <div class="tabs">
+        <div id="tabBuscar" class="tab activa" onclick="cambiarVista('buscar')">🔍 Buscar</div>
+        <div id="tabBiblioteca" class="tab" onclick="cambiarVista('biblioteca')">📁 Mi Biblioteca</div>
+    </div>
+
+    <!-- VISTA 1: BUSCADOR ONLINE -->
+    <div id="vistaBuscar" class="vista activa">
+        <div class="contenedor-busqueda">
+            <input type="text" id="inputBusqueda" class="input-busqueda" placeholder="Buscar artista o canción...">
+            <button id="botonBuscar" class="boton-lupa" onclick="realizarBusqueda()">Ir</button>
+        </div>
+        <div id="resultadosBusqueda" class="lista-resultados"></div>
+    </div>
+
+    <!-- VISTA 2: MI BIBLIOTECA OFFLINE -->
+    <div id="vistaBiblioteca" class="vista">
+        <div id="resultadosBiblioteca" class="lista-resultados"></div>
+    </div>
 
     <script>
-        // Variables de la interfaz
-        const inputBusqueda = document.getElementById('inputBusqueda');
-        const botonBuscar = document.getElementById('botonBuscar');
-        const contenedorResultados = document.getElementById('contenedorResultados');
-        const caratula = document.getElementById('caratula');
+        const reproductor = new Audio();
+        let estaReproduciendo = false;
+        const NOMBRE_CACHE = 'mayi-music-cache-v1';
+
+        // Variables UI
         const titulo = document.getElementById('titulo');
         const artista = document.getElementById('artista');
-        const botonReproducir = document.getElementById('botonReproducir');
+        const caratula = document.getElementById('caratula');
+        const btnReproducir = document.getElementById('btnReproducir');
         const barraProgreso = document.getElementById('barraProgreso');
         const txtTiempoActual = document.getElementById('tiempoActual');
         const txtTiempoTotal = document.getElementById('tiempoTotal');
+        const inputBusqueda = document.getElementById('inputBusqueda');
+        const resultadosBusqueda = document.getElementById('resultadosBusqueda');
+        const resultadosBiblioteca = document.getElementById('resultadosBiblioteca');
 
-        let reproductorYT;
-        let estaReproduciendo = false;
-        let intervaloProgreso;
-
-        // 1. CARGAR LA API OFICIAL DE YOUTUBE
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        function onYouTubeIframeAPIReady() {
-            reproductorYT = new YT.Player('reproductor-youtube', {
-                height: '0',
-                width: '0',
-                videoId: '',
-                playerVars: { 'playsinline': 1 },
-                events: {
-                    'onStateChange': alCambiarEstado
-                }
-            });
-        }
-
+        // Formatear Tiempo
         function formatearTiempo(segundos) {
             if (isNaN(segundos)) return "0:00";
             const min = Math.floor(segundos / 60);
@@ -136,136 +123,186 @@
             return `${min}:${seg < 10 ? '0' : ''}${seg}`;
         }
 
-        // 2. BUSCADOR DE YOUTUBE (Usando un proxy abierto y gratuito)
+        // --- SISTEMA DE PESTAÑAS ---
+        function cambiarVista(vista) {
+            document.getElementById('vistaBuscar').classList.remove('activa');
+            document.getElementById('vistaBiblioteca').classList.remove('activa');
+            document.getElementById('tabBuscar').classList.remove('activa');
+            document.getElementById('tabBiblioteca').classList.remove('activa');
+
+            if (vista === 'buscar') {
+                document.getElementById('vistaBuscar').classList.add('activa');
+                document.getElementById('tabBuscar').classList.add('activa');
+            } else {
+                document.getElementById('vistaBiblioteca').classList.add('activa');
+                document.getElementById('tabBiblioteca').classList.add('activa');
+                cargarBiblioteca();
+            }
+        }
+
+        // --- 1. BUSCADOR ONLINE ---
         async function realizarBusqueda() {
             const termino = inputBusqueda.value;
             if (!termino) return;
             
             inputBusqueda.blur();
-            contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Buscando en YouTube...</p>";
+            resultadosBusqueda.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Buscando...</p>";
             
             try {
-                // Usamos la API pública de Piped (un puente hacia YouTube)
-                const respuesta = await fetch(`https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(termino + ' audio oficial')}&filter=music_songs`);
+                // Usamos un proxy directo para evitar los errores de servidor saturado
+                const urlOriginal = `https://saavn.dev/api/search/songs?query=${encodeURIComponent(termino)}`;
+                const urlPuente = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlOriginal)}`;
+                
+                const respuesta = await fetch(urlPuente);
                 const json = await respuesta.json();
                 
-                if (json.items && json.items.length > 0) {
-                    mostrarResultados(json.items);
+                if (json.success && json.data.results.length > 0) {
+                    mostrarResultados(json.data.results, resultadosBusqueda, true);
                 } else {
-                    contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>No se encontraron resultados.</p>";
+                    resultadosBusqueda.innerHTML = "<p style='text-align:center;'>No se encontraron resultados.</p>";
                 }
             } catch (error) {
-                contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Error al conectar con YouTube. Intenta de nuevo.</p>";
+                resultadosBusqueda.innerHTML = "<p style='text-align:center;'>Error al conectar. Intenta otra vez.</p>";
             }
         }
 
-        botonBuscar.addEventListener('click', realizarBusqueda);
-        inputBusqueda.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') realizarBusqueda();
-        });
-
-        // 3. MAPEO Y RESULTADOS
-        function mostrarResultados(resultados) {
-            contenedorResultados.innerHTML = '';
+        // --- 2. MOSTRAR RESULTADOS (Tanto Online como Offline) ---
+        function mostrarResultados(lista, contenedor, esOnline) {
+            contenedor.innerHTML = '';
             
-            resultados.slice(0, 5).forEach(item => {
-                // Extraemos el ID del video de YouTube (ej: /watch?v=ABCDEFG)
-                const videoId = item.url.split('v=')[1];
+            const maxResultados = esOnline ? lista.slice(0, 10) : lista;
+            
+            maxResultados.forEach(item => {
+                // Si viene de internet, mapeamos. Si viene de la biblioteca local, ya tiene nuestro formato.
+                const cancion = esOnline ? {
+                    id: item.id,
+                    titulo: item.name,
+                    artista: item.primaryArtists || "Artista",
+                    imagen: item.image && item.image.length > 0 ? item.image[item.image.length - 1].url : 'logo.png',
+                    audioUrl: item.downloadUrl && item.downloadUrl.length > 0 ? item.downloadUrl[item.downloadUrl.length - 1].url : ''
+                } : item;
 
-                const cancion = {
-                    id: videoId,
-                    titulo: item.title,
-                    artista: item.uploaderName || "YouTube Music",
-                    urlCaratula: item.thumbnail || 'logo.png'
-                };
-
-                if (!cancion.id) return;
+                if (!cancion.audioUrl) return;
 
                 const div = document.createElement('div');
                 div.className = 'item-cancion';
                 div.innerHTML = `
-                    <img src="${cancion.urlCaratula}" class="item-imagen">
+                    <img src="${cancion.imagen}" class="item-imagen">
                     <div class="item-textos">
                         <p class="item-titulo">${cancion.titulo}</p>
                         <p class="item-artista">${cancion.artista}</p>
                     </div>
+                    ${!esOnline ? '<span class="icono-descarga">✓</span>' : ''}
                 `;
 
-                div.onclick = () => cargarCancion(cancion);
-                contenedorResultados.appendChild(div);
+                div.onclick = () => reproducirYDescargar(cancion);
+                contenedor.appendChild(div);
             });
         }
 
-        // 4. CONTROL DEL REPRODUCTOR INVISIBLE DE YOUTUBE
-        function cargarCancion(cancion) {
+        // --- 3. EL CORAZÓN DE LA APP: REPRODUCIR Y CACHEAR INVISIBLEMENTE ---
+        async function reproducirYDescargar(cancion) {
             titulo.textContent = cancion.titulo;
             artista.textContent = cancion.artista;
-            caratula.src = cancion.urlCaratula;
+            caratula.src = cancion.imagen;
             
-            // Le pasamos el ID a YouTube y le decimos que inicie
-            reproductorYT.loadVideoById(cancion.id);
+            // 3.1 Abrimos la bóveda interna del celular (Cache API)
+            const cache = await caches.open(NOMBRE_CACHE);
             
-            estaReproduciendo = true;
-            botonReproducir.textContent = "Pausar";
-            contenedorResultados.innerHTML = ''; 
-            inputBusqueda.value = '';
+            // 3.2 ¿Ya guardamos esta canción antes?
+            const respuestaAudio = await cache.match(cancion.audioUrl);
             
-            iniciarBarraProgreso();
-        }
-
-        botonReproducir.addEventListener("click", () => {
-            if (!reproductorYT || !reproductorYT.getPlayerState) return;
-            
-            const estado = reproductorYT.getPlayerState();
-            
-            // Si está sonando (estado 1), pausamos
-            if (estado === 1) {
-                reproductorYT.pauseVideo();
-                botonReproducir.textContent = "Reproducir";
-                estaReproduciendo = false;
+            if (respuestaAudio) {
+                // ¡LA TENEMOS! Se reproduce desde el disco duro del iPhone, sin gastar internet.
+                const blob = await respuestaAudio.blob();
+                reproductor.src = URL.createObjectURL(blob);
+                console.log("Reproduciendo desde la Bóveda Local");
             } else {
-                reproductorYT.playVideo();
-                botonReproducir.textContent = "Pausar";
-                estaReproduciendo = true;
-            }
-        });
-
-        // Eventos de YouTube (cuando termina la canción)
-        function alCambiarEstado(evento) {
-            if (evento.data === YT.PlayerState.ENDED) {
-                botonReproducir.textContent = "Reproducir";
-                estaReproduciendo = false;
-                barraProgreso.value = 0;
-                txtTiempoActual.textContent = "0:00";
-            }
-        }
-
-        // Actualizar la barra de progreso a mano porque YouTube no tiene evento 'timeupdate'
-        function iniciarBarraProgreso() {
-            clearInterval(intervaloProgreso);
-            intervaloProgreso = setInterval(() => {
-                if (reproductorYT && reproductorYT.getCurrentTime && estaReproduciendo) {
-                    const tiempoActual = reproductorYT.getCurrentTime();
-                    const tiempoTotal = reproductorYT.getDuration();
+                // NO LA TENEMOS. La reproducimos de internet normal...
+                reproductor.src = cancion.audioUrl;
+                console.log("Reproduciendo desde Internet y descargando en segundo plano...");
+                
+                // ...y mientras suena, la descargamos en secreto al Caché
+                try {
+                    const fetchAudio = await fetch(cancion.audioUrl, { mode: 'no-cors' });
+                    await cache.put(cancion.audioUrl, fetchAudio);
                     
-                    if (tiempoTotal > 0) {
-                        const porcentaje = (tiempoActual / tiempoTotal) * 100;
-                        barraProgreso.value = porcentaje;
-                        
-                        txtTiempoActual.textContent = formatearTiempo(tiempoActual);
-                        txtTiempoTotal.textContent = formatearTiempo(tiempoTotal);
-                    }
-                }
-            }, 1000); // Se actualiza cada segundo
+                    const fetchImg = await fetch(cancion.imagen, { mode: 'no-cors' });
+                    await cache.put(cancion.imagen, fetchImg);
+                    
+                    guardarEnBibliotecaLocal(cancion);
+                } catch(e) { console.log("No se pudo cachear en este momento"); }
+            }
+
+            reproductor.play();
+            estaReproduciendo = true;
+            btnReproducir.textContent = "Pausa";
+            
+            // Configuramos la pantalla de bloqueo
+            configurarPantallaBloqueo(cancion);
         }
 
-        // Permitir adelantar la canción arrastrando la barra
-        barraProgreso.addEventListener('input', () => {
-            if (reproductorYT && reproductorYT.getDuration) {
-                const nuevoTiempo = (barraProgreso.value / 100) * reproductorYT.getDuration();
-                reproductorYT.seekTo(nuevoTiempo, true);
+        // --- 4. BASE DE DATOS LOCAL (Para saber qué hemos descargado) ---
+        function guardarEnBibliotecaLocal(cancion) {
+            let miBiblioteca = JSON.parse(localStorage.getItem('mayi_biblioteca') || '[]');
+            // Verificamos que no esté duplicada
+            const existe = miBiblioteca.find(c => c.id === cancion.id);
+            if (!existe) {
+                miBiblioteca.push(cancion);
+                localStorage.setItem('mayi_biblioteca', JSON.stringify(miBiblioteca));
+            }
+        }
+
+        function cargarBiblioteca() {
+            let miBiblioteca = JSON.parse(localStorage.getItem('mayi_biblioteca') || '[]');
+            if (miBiblioteca.length === 0) {
+                resultadosBiblioteca.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Aún no has descargado música. Todo lo que escuches en 'Buscar' aparecerá aquí.</p>";
+            } else {
+                mostrarResultados(miBiblioteca.reverse(), resultadosBiblioteca, false);
+            }
+        }
+
+        // --- 5. CONTROLES DE AUDIO ---
+        btnReproducir.addEventListener("click", () => {
+            if (!reproductor.src) return;
+            if (estaReproduciendo) {
+                reproductor.pause();
+                btnReproducir.textContent = "Play";
+            } else {
+                reproductor.play();
+                btnReproducir.textContent = "Pausa";
+            }
+            estaReproduciendo = !estaReproduciendo;
+        });
+
+        reproductor.addEventListener('timeupdate', () => {
+            if (reproductor.duration) {
+                const porcentaje = (reproductor.currentTime / reproductor.duration) * 100;
+                barraProgreso.value = porcentaje;
+                txtTiempoActual.textContent = formatearTiempo(reproductor.currentTime);
+                txtTiempoTotal.textContent = formatearTiempo(reproductor.duration);
             }
         });
+
+        barraProgreso.addEventListener('input', () => {
+            if (reproductor.duration) {
+                reproductor.currentTime = (barraProgreso.value / 100) * reproductor.duration;
+            }
+        });
+
+        function configurarPantallaBloqueo(cancion) {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: cancion.titulo,
+                    artist: cancion.artista,
+                    album: "Mayi Music",
+                    artwork: [{ src: cancion.imagen, sizes: '512x512', type: 'image/png' }]
+                });
+            }
+        }
+        
+        // Ejecutamos la búsqueda si presiona Enter
+        inputBusqueda.addEventListener('keypress', (e) => { if (e.key === 'Enter') realizarBusqueda(); });
     </script>
 </body>
 </html>
