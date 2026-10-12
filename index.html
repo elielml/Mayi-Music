@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#121212">
     <title>Mayi Music</title>
     
     <style>
         body {
             margin: 0;
             padding: 20px;
-            background-color: #121212; /* Un negro más suave estilo Spotify */
+            background-color: #121212;
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
@@ -20,120 +20,73 @@
             align-items: center;
             height: 100vh;
             box-sizing: border-box;
+            user-select: none; 
+            -webkit-user-select: none;
         }
         
-        /* --- BUSCADOR --- */
-        .contenedor-busqueda {
-            width: 100%;
-            max-width: 400px;
-            margin-bottom: 20px;
-            margin-top: 10px;
-        }
+        .contenedor-busqueda { width: 100%; max-width: 400px; margin-bottom: 15px; margin-top: 10px; }
         .input-busqueda {
-            width: 100%;
-            padding: 15px;
-            border-radius: 25px;
-            border: none;
-            background-color: #282828;
-            color: white;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
+            width: 100%; padding: 15px; border-radius: 25px; border: none;
+            background-color: #282828; color: white; font-size: 16px; box-sizing: border-box; outline: none;
         }
         
-        /* --- LISTA DE RESULTADOS --- */
-        .resultados {
-            width: 100%;
-            max-width: 400px;
-            max-height: 150px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
+        .resultados { width: 100%; max-width: 400px; max-height: 180px; overflow-y: auto; margin-bottom: 20px; }
         .item-cancion {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            background-color: #181818;
-            margin-bottom: 5px;
-            border-radius: 10px;
-            cursor: pointer;
+            display: flex; align-items: center; padding: 10px;
+            background-color: #181818; margin-bottom: 5px; border-radius: 10px; cursor: pointer;
         }
         .item-cancion:active { background-color: #282828; }
-        .item-imagen { width: 40px; height: 40px; border-radius: 5px; margin-right: 15px; }
-        .item-textos { display: flex; flex-direction: column; }
-        .item-titulo { font-size: 14px; font-weight: bold; margin: 0; }
+        .item-imagen { width: 45px; height: 45px; border-radius: 5px; margin-right: 15px; object-fit: cover; }
+        .item-textos { display: flex; flex-direction: column; overflow: hidden; }
+        .item-titulo { font-size: 14px; font-weight: bold; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .item-artista { font-size: 12px; color: #A0A0A0; margin: 0; }
 
-        /* --- REPRODUCTOR PRINCIPAL --- */
         .reproductor {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 400px;
-            flex-grow: 1;
-            justify-content: center;
+            display: flex; flex-direction: column; align-items: center; width: 100%;
+            max-width: 400px; flex-grow: 1; justify-content: center;
         }
         .caratula {
-            width: 280px;
-            height: 280px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            object-fit: cover;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 280px; height: 280px; border-radius: 20px; margin-bottom: 30px;
+            object-fit: cover; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
         .titulo { font-size: 24px; font-weight: bold; margin: 0 0 5px 0; text-align: center; }
         .artista { font-size: 16px; color: #A0A0A0; margin: 0 0 30px 0; text-align: center; }
         
-        /* --- BARRA DE PROGRESO --- */
-        .contenedor-progreso { width: 100%; margin-bottom: 30px; }
+        .contenedor-progreso { width: 100%; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .tiempo { font-size: 12px; color: #A0A0A0; width: 40px; text-align: center; }
         .barra-progreso {
-            width: 100%;
-            appearance: none;
-            height: 6px;
-            background: #404040;
-            border-radius: 5px;
-            outline: none;
+            flex-grow: 1; appearance: none; height: 6px; background: #404040;
+            border-radius: 5px; outline: none;
         }
         .barra-progreso::-webkit-slider-thumb {
-            appearance: none;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #E1306C;
-            cursor: pointer;
+            appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #E1306C; cursor: pointer;
         }
 
         .boton {
-            background-color: #E1306C;
-            color: white;
-            border: none;
-            padding: 18px 50px;
-            border-radius: 30px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
+            background-color: #E1306C; color: white; border: none; padding: 18px 50px;
+            border-radius: 30px; font-size: 20px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
         }
+        .boton:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
-    <!-- Buscador -->
     <div class="contenedor-busqueda">
-        <input type="text" id="inputBusqueda" class="input-busqueda" placeholder="Buscar artista o canción para Mayi...">
+        <input type="text" id="inputBusqueda" class="input-busqueda" placeholder="Buscar canción completa...">
     </div>
 
-    <!-- Resultados -->
     <div id="contenedorResultados" class="resultados"></div>
 
-    <!-- Reproductor -->
     <div class="reproductor">
-        <img id="caratula" class="caratula" src="logo.png" alt="Mayi">
-        <h1 id="titulo" class="titulo">Busca una canción</h1>
-        <p id="artista" class="artista">Mayi Music</p>
+        <!-- Reemplaza logo.png por la foto que quieras que salga por defecto -->
+        <img id="caratula" class="caratula" src="logo.png" alt="Mayi Music">
+        <h1 id="titulo" class="titulo">Mayi Music</h1>
+        <p id="artista" class="artista">Buscador Activo</p>
 
         <div class="contenedor-progreso">
+            <span id="tiempoActual" class="tiempo">0:00</span>
             <input type="range" id="barraProgreso" class="barra-progreso" value="0" step="1" min="0" max="100">
+            <span id="tiempoTotal" class="tiempo">0:00</span>
         </div>
 
         <button id="botonReproducir" class="boton">Reproducir</button>
@@ -143,7 +96,6 @@
         const reproductor = new Audio();
         let estaReproduciendo = false;
 
-        // Elementos de la interfaz
         const inputBusqueda = document.getElementById('inputBusqueda');
         const contenedorResultados = document.getElementById('contenedorResultados');
         const caratula = document.getElementById('caratula');
@@ -151,35 +103,63 @@
         const artista = document.getElementById('artista');
         const botonReproducir = document.getElementById('botonReproducir');
         const barraProgreso = document.getElementById('barraProgreso');
+        const txtTiempoActual = document.getElementById('tiempoActual');
+        const txtTiempoTotal = document.getElementById('tiempoTotal');
 
-        // 1. LA BÚSQUEDA SILENCIOSA
+        // Formatear segundos a minutos:segundos (Ej: 3:45)
+        function formatearTiempo(segundos) {
+            if (isNaN(segundos)) return "0:00";
+            const min = Math.floor(segundos / 60);
+            const seg = Math.floor(segundos % 60);
+            return `${min}:${seg < 10 ? '0' : ''}${seg}`;
+        }
+
+        // 1. LA BÚSQUEDA A LA API DE CANCIONES COMPLETAS
         inputBusqueda.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter') {
                 const termino = inputBusqueda.value;
                 if (!termino) return;
                 
-                contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Buscando...</p>";
+                // Ocultar teclado en móviles
+                inputBusqueda.blur();
+                contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Buscando canciones completas...</p>";
                 
-                // Conectamos a una API real
-                const respuesta = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termino)}&entity=song&limit=5`);
-                const datos = await respuesta.json();
-                
-                mostrarResultados(datos.results);
+                try {
+                    // Nos conectamos a la API pública de Saavn (canciones enteras)
+                    const respuesta = await fetch(`https://saavn.dev/api/search/songs?query=${encodeURIComponent(termino)}`);
+                    const json = await respuesta.json();
+                    
+                    if (json.success && json.data.results.length > 0) {
+                        mostrarResultados(json.data.results);
+                    } else {
+                        contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>No se encontraron resultados.</p>";
+                    }
+                } catch (error) {
+                    contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Error al conectar. Intenta de nuevo.</p>";
+                }
             }
         });
 
-        // 2. EL MAPEO Y LA INYECCIÓN VISUAL
+        // 2. EL MAPEO DE DATOS
         function mostrarResultados(resultados) {
             contenedorResultados.innerHTML = '';
             
-            resultados.forEach(item => {
-                // Nuestro Modelo de Datos Unificado
+            // Tomamos los primeros 5 resultados para no saturar la pantalla
+            resultados.slice(0, 5).forEach(item => {
+                
+                // Buscamos la mejor calidad de imagen y audio en los arreglos que devuelve la API
+                const mejorImagen = item.image && item.image.length > 0 ? item.image[item.image.length - 1].url : 'logo.png';
+                const mejorAudio = item.downloadUrl && item.downloadUrl.length > 0 ? item.downloadUrl[item.downloadUrl.length - 1].url : '';
+
                 const cancion = {
-                    titulo: item.trackName,
-                    artista: item.artistName,
-                    urlCaratula: item.artworkUrl100.replace('100x100', '400x400'), // Pedimos mejor calidad
-                    fuenteDeAudio: item.previewUrl // ¡El enlace oculto!
+                    titulo: item.name,
+                    artista: item.primaryArtists || "Artista",
+                    urlCaratula: mejorImagen,
+                    fuenteDeAudio: mejorAudio
                 };
+
+                // Si por alguna razón la canción no tiene enlace de audio, la saltamos
+                if (!cancion.fuenteDeAudio) return;
 
                 const div = document.createElement('div');
                 div.className = 'item-cancion';
@@ -191,32 +171,29 @@
                     </div>
                 `;
 
-                // Al tocar una canción de la lista
                 div.onclick = () => cargarCancion(cancion);
                 contenedorResultados.appendChild(div);
             });
         }
 
-        // 3. LA REPRODUCCIÓN OCULTA
+        // 3. REPRODUCCIÓN OCULTA
         function cargarCancion(cancion) {
-            // Actualizamos la interfaz
             titulo.textContent = cancion.titulo;
             artista.textContent = cancion.artista;
             caratula.src = cancion.urlCaratula;
             
-            // Inyectamos el audio real al motor invisible
             reproductor.src = cancion.fuenteDeAudio;
             reproductor.play();
             
             estaReproduciendo = true;
             botonReproducir.textContent = "Pausar";
-            contenedorResultados.innerHTML = ''; // Limpiamos la búsqueda
+            contenedorResultados.innerHTML = ''; 
             inputBusqueda.value = '';
         }
 
-        // Control del Botón
+        // Control del Botón Play/Pause
         botonReproducir.addEventListener("click", () => {
-            if (!reproductor.src) return; // Si no hay canción cargada, no hace nada
+            if (!reproductor.src) return; 
             
             if (estaReproduciendo) {
                 reproductor.pause();
@@ -228,21 +205,15 @@
             estaReproduciendo = !estaReproduciendo;
         });
 
-        // Control de la Barra de Progreso
-        reproductor.addEventListener('timeupdate', () => {
-            if (reproductor.duration) {
-                const porcentaje = (reproductor.currentTime / reproductor.duration) * 100;
-                barraProgreso.value = porcentaje;
-            }
+        // Evento cuando la canción termina
+        reproductor.addEventListener('ended', () => {
+            botonReproducir.textContent = "Reproducir";
+            estaReproduciendo = false;
+            barraProgreso.value = 0;
+            txtTiempoActual.textContent = "0:00";
         });
 
-        // Permitir adelantar la canción arrastrando la barra
-        barraProgreso.addEventListener('input', () => {
+        // Actualizar la barra de progreso y los textos de tiempo
+        reproductor.addEventListener('timeupdate', () => {
             if (reproductor.duration) {
-                const nuevoTiempo = (barraProgreso.value / 100) * reproductor.duration;
-                reproductor.currentTime = nuevoTiempo;
-            }
-        });
-    </script>
-</body>
-</html>
+                const
