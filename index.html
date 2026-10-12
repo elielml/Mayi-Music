@@ -369,7 +369,7 @@
         // 1. CONFIGURACIÓN DE GOOGLE DRIVE API
         // ==========================================
         // PEGA AQUÍ TU CLIENT_ID GENERADO EN GOOGLE CLOUD
-        const CLIENT_ID = 'TU_CLIENT_ID_AQUI'; 
+        const CLIENT_ID = '653060470584-p0ih9jvbhkcv8rk4sm9in5nfcs2pog7a.apps.googleusercontent.com'; 
         
         let tokenClient;
         let accessToken = null;
@@ -795,7 +795,6 @@
             if (isOnlinePlay || track.isOnline) {
                 if (!navigator.onLine) { alert("Sin conexión."); return; }
                 
-                // Si aún no hemos descargado el enlace del audio
                 if (!track.url) {
                     playerTitle.textContent = "Descargando...";
                     try {
@@ -805,7 +804,7 @@
                         if (!res.ok) throw new Error("No autorizado o no disponible");
                         const blob = await res.blob();
                         track.url = URL.createObjectURL(blob);
-                        playerTitle.textContent = track.title; // Restaurar título
+                        playerTitle.textContent = track.title; 
                     } catch(e) {
                         alert("Error al descargar el archivo desde Google Drive.");
                         playerTitle.textContent = track.title;
