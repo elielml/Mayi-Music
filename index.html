@@ -66,7 +66,6 @@
             padding: 0 15px;
         }
 
-        /* NAVEGACIÓN ENTRE PESTAÑAS (MÚSICA / VIDEOS) */
         .main-tabs {
             display: flex;
             background-color: var(--surface-color);
@@ -379,7 +378,7 @@
             cursor: pointer;
         }
 
-        /* REPRODUCTOR DE VIDEO EN PANTALLA COMPLETA */
+        /* REPRODUCTOR DE VIDEO */
         #video-modal {
             position: fixed;
             top: 0;
@@ -618,7 +617,6 @@
     </header>
 
     <main>
-        <!-- NAVEGACIÓN PRINCIPAL (MÚSICA / VIDEOS) -->
         <div class="main-tabs">
             <button class="main-tab active" id="tab-music-btn" onclick="switchMainTab('music')">
                 <span class="material-icons">library_music</span> Música
@@ -632,7 +630,7 @@
         <div id="section-music">
             <div class="controls-section">
                 <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                    Biblioteca musical local. Tus canciones y letras se guardan automáticamente.
+                    Biblioteca musical permanente. Los archivos se guardan en la memoria interna de la app.
                 </p>
                 
                 <div class="search-bar">
@@ -651,7 +649,7 @@
                     </button>
                 </div>
                 
-                <div id="status-message">Cargando biblioteca...</div>
+                <div id="status-message">Iniciando base de datos...</div>
             </div>
 
             <ul id="playlist"></ul>
@@ -661,7 +659,7 @@
         <div id="section-video" style="display: none;">
             <div class="controls-section">
                 <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                    Reproductor de videos musicales. Gira tu pantalla en horizontal o vertical libremente.
+                    Reproductor de videos musicales persistente.
                 </p>
 
                 <div class="action-row">
@@ -676,7 +674,7 @@
                     </button>
                 </div>
                 
-                <div id="video-status-message">Cargando biblioteca de videos...</div>
+                <div id="video-status-message">Iniciando base de datos de videos...</div>
             </div>
 
             <ul id="video-playlist"></ul>
@@ -713,7 +711,7 @@
         </div>
     </div>
 
-    <!-- REPRODUCTOR DE VIDEO EN PANTALLA COMPLETA -->
+    <!-- REPRODUCTOR DE VIDEO -->
     <div id="video-modal">
         <div class="video-header">
             <span class="material-icons" onclick="closeVideoModal()" style="cursor: pointer; font-size: 32px;">expand_more</span>
@@ -767,7 +765,65 @@
     </div>
 
     <script>
-        // --- CONTROL DE PESTAÑAS (MÚSICA / VIDEOS) ---
+        // --- BASE DE DATOS INTERNA (IndexedDB) PARA GUARDAR ARCHIVOS FÍSICOS PERMANENTEMENTE ---
+        const dbName = "MayiMusicDB";
+        const dbVersion = 1;
+        let db = null;
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(dbName, dbVersion);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    if (!database.objectStoreNames.contains("music")) {
+                        database.createObjectStore("music", { keyPath: "id" });
+                    }
+                    if (!database.objectStoreNames.contains("videos")) {
+                        database.createObjectStore("videos", { keyPath: "id" });
+                    }
+                };
+            });
+        }
+
+        function saveFileToDB(storeName, item) {
+            return new Promise((resolve, reject) => {
+                if (!db) return reject("DB no inicializada");
+                const transaction = db.transaction(storeName, "readwrite");
+                const store = transaction.objectStore(storeName);
+                const request = store.put(item);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function getAllFilesFromDB(storeName) {
+            return new Promise((resolve, reject) => {
+                if (!db) return reject("DB no inicializada");
+                const transaction = db.transaction(storeName, "readonly");
+                const store = transaction.objectStore(storeName);
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function clearDBStore(storeName) {
+            return new Promise((resolve, reject) => {
+                if (!db) return reject("DB no inicializada");
+                const transaction = db.transaction(storeName, "readwrite");
+                const store = transaction.objectStore(storeName);
+                const request = store.clear();
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // --- NAVEGACIÓN ---
         function switchMainTab(tab) {
             const musicSection = document.getElementById('section-music');
             const videoSection = document.getElementById('section-video');
@@ -786,12 +842,10 @@
                 videoSection.style.display = 'block';
                 musicTabBtn.classList.remove('active');
                 videoTabBtn.classList.add('active');
-                // Si la música está sonando, podemos ocultar la barra inferior de música para dar espacio a los videos
                 musicPlayerBar.style.display = audio.paused ? 'none' : 'flex';
             }
         }
 
-        // --- LÓGICA DE MÚSICA ---
         const audio = new Audio();
         let library = [];      
         let currentQueue = []; 
@@ -800,7 +854,6 @@
         let isShuffle = false;
         let lyricLines = [];
 
-        // --- LÓGICA DE VIDEOS ---
         let videoLibrary = [];
         const videoPlaylistEl = document.getElementById('video-playlist');
         const videoModal = document.getElementById('video-modal');
@@ -833,54 +886,50 @@
         const lyricsBoxContainer = document.getElementById('lyrics-box-container');
         const addLyricsTrigger = document.getElementById('add-lyrics-trigger');
 
-        window.addEventListener('DOMContentLoaded', () => {
-            // Cargar Música
-            const savedLibrary = localStorage.getItem('mayi_music_library');
-            if (savedLibrary) {
-                try {
-                    library = JSON.parse(savedLibrary);
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initDB();
+                
+                // Cargar Música guardada permanentemente
+                const savedMusic = await getAllFilesFromDB("music");
+                if (savedMusic && savedMusic.length > 0) {
+                    library = savedMusic.map(item => ({
+                        ...item,
+                        url: URL.createObjectURL(item.blob) // Creamos enlace interno desde el archivo guardado
+                    }));
                     currentQueue = [...library];
-                    statusMsg.textContent = `${library.length} canciones guardadas.`;
+                    statusMsg.textContent = `${library.length} canciones cargadas desde la memoria interna.`;
                     renderLibrary();
                     if (library.length > 0) {
                         currentIndex = 0;
                         updateTrackUI(library[0]);
                     }
-                } catch(e) { console.error(e); }
-            } else {
-                statusMsg.textContent = "Biblioteca musical vacía.";
-            }
+                } else {
+                    statusMsg.textContent = "Biblioteca musical vacía.";
+                }
 
-            // Cargar Videos
-            const savedVideos = localStorage.getItem('mayi_video_library');
-            if (savedVideos) {
-                try {
-                    videoLibrary = JSON.parse(savedVideos);
-                    videoStatusMsg.textContent = `${videoLibrary.length} videos guardados.`;
+                // Cargar Videos guardados permanentemente
+                const savedVideos = await getAllFilesFromDB("videos");
+                if (savedVideos && savedVideos.length > 0) {
+                    videoLibrary = savedVideos.map(item => ({
+                        ...item,
+                        url: URL.createObjectURL(item.blob)
+                    }));
+                    videoStatusMsg.textContent = `${videoLibrary.length} videos cargados desde la memoria interna.`;
                     renderVideoLibrary();
-                } catch(e) { console.error(e); }
-            } else {
-                videoStatusMsg.textContent = "Biblioteca de videos vacía.";
+                } else {
+                    videoStatusMsg.textContent = "Biblioteca de videos vacía.";
+                }
+
+            } catch(e) {
+                console.error("Error al iniciar almacenamiento persistente", e);
+                statusMsg.textContent = "Error al cargar la memoria interna.";
             }
         });
 
-        function saveLibraryToLocalStorage() {
-            const dataToSave = library.map(t => ({
-                id: t.id, title: t.title, artist: t.artist, lyrics: t.lyrics, cover: t.cover
-            }));
-            localStorage.setItem('mayi_music_library', JSON.stringify(dataToSave));
-        }
-
-        function saveVideoLibraryToLocalStorage() {
-            const dataToSave = videoLibrary.map(v => ({
-                id: v.id, title: v.title, artist: v.artist
-            }));
-            localStorage.setItem('mayi_video_library', JSON.stringify(dataToSave));
-        }
-
-        function clearLibrary() {
+        async function clearLibrary() {
             if (confirm("¿Borrar toda la música guardada?")) {
-                localStorage.removeItem('mayi_music_library');
+                await clearDBStore("music");
                 library = []; currentQueue = []; currentIndex = -1;
                 audio.pause(); audio.src = "";
                 renderLibrary();
@@ -890,9 +939,9 @@
             }
         }
 
-        function clearVideoLibrary() {
+        async function clearVideoLibrary() {
             if (confirm("¿Borrar todos los videos guardados?")) {
-                localStorage.removeItem('mayi_video_library');
+                await clearDBStore("videos");
                 videoLibrary = [];
                 mainVideoPlayer.pause();
                 mainVideoPlayer.src = "";
@@ -901,13 +950,13 @@
             }
         }
 
-        // --- GESTIÓN DE ARCHIVOS DE VIDEO ---
-        function loadLocalVideos(event) {
+        // --- CARGAR Y GUARDAR ARCHIVOS DE VIDEO EN LA DB ---
+        async function loadLocalVideos(event) {
             const files = event.target.files;
             if (files.length === 0) return;
 
+            videoStatusMsg.textContent = "Guardando videos en memoria interna...";
             for (let file of files) {
-                const url = URL.createObjectURL(file);
                 let rawName = file.name.replace(/\.[^/.]+$/, ""); 
                 let artist = "Video Musical";
                 let title = rawName;
@@ -918,21 +967,22 @@
                     title = parts.slice(1).join("-").trim();
                 }
 
-                let existing = videoLibrary.find(v => v.title.toLowerCase() === title.toLowerCase());
-                if (existing) {
-                    existing.url = url;
-                } else {
-                    videoLibrary.push({
-                        id: Date.now() + Math.random(),
-                        title: title,
-                        artist: artist,
-                        url: url
-                    });
-                }
+                const videoItem = {
+                    id: Date.now() + Math.random(),
+                    title: title,
+                    artist: artist,
+                    blob: file // Guardamos el archivo binario real
+                };
+
+                await saveFileToDB("videos", videoItem);
+                
+                videoLibrary.push({
+                    ...videoItem,
+                    url: URL.createObjectURL(file)
+                });
             }
 
-            videoStatusMsg.textContent = `${videoLibrary.length} videos en la biblioteca.`;
-            saveVideoLibraryToLocalStorage();
+            videoStatusMsg.textContent = `${videoLibrary.length} videos guardados correctamente.`;
             renderVideoLibrary();
         }
 
@@ -963,16 +1013,7 @@
 
         function playVideo(index) {
             const video = videoLibrary[index];
-            if (!video.url) {
-                alert("Por favor, vuelve a cargar tus videos locales para activar la reproducción.");
-                return;
-            }
-
-            // Si la música está sonando, la pausamos para que no choquen los audios
-            if (!audio.paused) {
-                pauseTrack();
-            }
-
+            if (!audio.paused) pauseTrack();
             mainVideoPlayer.src = video.url;
             videoModalTitle.textContent = video.title;
             videoModal.classList.add('open');
@@ -985,13 +1026,13 @@
             videoModal.classList.remove('open');
         }
 
-        // --- GESTIÓN DE MÚSICA ---
-        function loadLocalFiles(event) {
+        // --- CARGAR Y GUARDAR MÚSICA EN LA DB ---
+        async function loadLocalFiles(event) {
             const files = event.target.files;
             if (files.length === 0) return;
 
+            statusMsg.textContent = "Guardando canciones en memoria interna...";
             for (let file of files) {
-                const url = URL.createObjectURL(file);
                 let rawName = file.name.replace(/\.[^/.]+$/, ""); 
                 let artist = "Desconocido";
                 let title = rawName;
@@ -1002,24 +1043,25 @@
                     title = parts.slice(1).join("-").trim();
                 }
 
-                let existing = library.find(t => t.title.toLowerCase() === title.toLowerCase());
-                if (existing) {
-                    existing.url = url; 
-                } else {
-                    library.push({
-                        id: Date.now() + Math.random(),
-                        title: title,
-                        artist: artist,
-                        url: url,
-                        cover: 'logo.png',
-                        lyrics: '' 
-                    });
-                }
+                const trackItem = {
+                    id: Date.now() + Math.random(),
+                    title: title,
+                    artist: artist,
+                    cover: 'logo.png',
+                    lyrics: '',
+                    blob: file // Guardamos el archivo binario real permanentemente
+                };
+
+                await saveFileToDB("music", trackItem);
+
+                library.push({
+                    ...trackItem,
+                    url: URL.createObjectURL(file)
+                });
             }
 
             currentQueue = [...library];
             statusMsg.textContent = `Biblioteca actualizada. (${library.length} canciones)`;
-            saveLibraryToLocalStorage();
             renderLibrary();
 
             if (currentIndex === -1 && library.length > 0) {
@@ -1122,7 +1164,7 @@
             updateTrackUI(track);
 
             if (!track.url) {
-                alert("El archivo físico necesita ser vinculado de nuevo. Toca 'Cargar Música'.");
+                alert("Error cargando el archivo.");
                 return;
             }
 
@@ -1135,7 +1177,7 @@
                 loadTrack(0);
             }
             if (!audio.src) {
-                alert("Por favor, selecciona tus archivos de audio locales.");
+                alert("Por favor, selecciona tus archivos de audio.");
                 return;
             }
 
@@ -1241,18 +1283,28 @@
             audio.volume = volumeBar.value;
         }
 
-        function saveLyrics() {
+        async function saveLyrics() {
             if (currentIndex === -1) return;
-            let currentTrackId = currentQueue[currentIndex].id;
+            let currentTrack = currentQueue[currentIndex];
             
             let text = lyricsInput.value;
-            currentQueue[currentIndex].lyrics = text;
-            let libItem = library.find(t => t.id === currentTrackId);
+            currentTrack.lyrics = text;
+            
+            let libItem = library.find(t => t.id === currentTrack.id);
             if (libItem) libItem.lyrics = text;
 
-            saveLibraryToLocalStorage();
-            updateTrackUI(currentQueue[currentIndex]);
-            alert("¡Letra guardada!");
+            // Actualizamos permanentemente en la base de datos interna
+            await saveFileToDB("music", {
+                id: currentTrack.id,
+                title: currentTrack.title,
+                artist: currentTrack.artist,
+                cover: currentTrack.cover,
+                lyrics: text,
+                blob: currentTrack.blob
+            });
+
+            updateTrackUI(currentTrack);
+            alert("¡Letra guardada permanentemente!");
         }
 
         function openFullscreenPlayer() {
@@ -1260,7 +1312,7 @@
             fsPlayer.classList.add('open');
         }
 
-        function closeFullscreenPlayer() {
+        function closeFullscreenParser() {
             fsPlayer.classList.remove('open');
         }
 
