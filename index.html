@@ -2,93 +2,245 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <!-- Configuración para que se vea como app nativa en celulares -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
-    <link rel="apple-touch-icon" href="logo.png">
-    
     <title>Mayi Music</title>
     
     <style>
         body {
             margin: 0;
-            padding: 0;
-            background-color: #000000;
+            padding: 20px;
+            background-color: #121212; /* Un negro más suave estilo Spotify */
             color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             height: 100vh;
-            /* Evita que el usuario seleccione el texto por accidente */
-            user-select: none; 
-            -webkit-user-select: none;
+            box-sizing: border-box;
+        }
+        
+        /* --- BUSCADOR --- */
+        .contenedor-busqueda {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+        .input-busqueda {
+            width: 100%;
+            padding: 15px;
+            border-radius: 25px;
+            border: none;
+            background-color: #282828;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        
+        /* --- LISTA DE RESULTADOS --- */
+        .resultados {
+            width: 100%;
+            max-width: 400px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .item-cancion {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: #181818;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .item-cancion:active { background-color: #282828; }
+        .item-imagen { width: 40px; height: 40px; border-radius: 5px; margin-right: 15px; }
+        .item-textos { display: flex; flex-direction: column; }
+        .item-titulo { font-size: 14px; font-weight: bold; margin: 0; }
+        .item-artista { font-size: 12px; color: #A0A0A0; margin: 0; }
+
+        /* --- REPRODUCTOR PRINCIPAL --- */
+        .reproductor {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            flex-grow: 1;
+            justify-content: center;
         }
         .caratula {
-            width: 260px;
-            height: 260px;
+            width: 280px;
+            height: 280px;
             border-radius: 20px;
             margin-bottom: 30px;
             object-fit: cover;
-            box-shadow: 0 10px 30px rgba(225, 48, 108, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-        .titulo {
-            font-size: 28px;
-            font-weight: bold;
-            margin: 0 0 8px 0;
-            text-align: center;
+        .titulo { font-size: 24px; font-weight: bold; margin: 0 0 5px 0; text-align: center; }
+        .artista { font-size: 16px; color: #A0A0A0; margin: 0 0 30px 0; text-align: center; }
+        
+        /* --- BARRA DE PROGRESO --- */
+        .contenedor-progreso { width: 100%; margin-bottom: 30px; }
+        .barra-progreso {
+            width: 100%;
+            appearance: none;
+            height: 6px;
+            background: #404040;
+            border-radius: 5px;
+            outline: none;
         }
-        .artista {
-            font-size: 18px;
-            color: #A0A0A0;
-            margin: 0 0 50px 0;
+        .barra-progreso::-webkit-slider-thumb {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #E1306C;
+            cursor: pointer;
         }
+
         .boton {
             background-color: #E1306C;
             color: white;
             border: none;
             padding: 18px 50px;
             border-radius: 30px;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .boton:active {
-            transform: scale(0.95);
         }
     </style>
 </head>
 <body>
 
-    <!-- Aquí cargará la foto de tu esposa que guardes en la carpeta -->
-    <img id="caratula" class="caratula" src="logo.png" alt="Mayi">
-    
-    <h1 id="titulo" class="titulo">Canción para Mayi</h1>
-    <p id="artista" class="artista">Solo para ti</p>
+    <!-- Buscador -->
+    <div class="contenedor-busqueda">
+        <input type="text" id="inputBusqueda" class="input-busqueda" placeholder="Buscar artista o canción para Mayi...">
+    </div>
 
-    <button id="botonReproducir" class="boton">Reproducir</button>
+    <!-- Resultados -->
+    <div id="contenedorResultados" class="resultados"></div>
+
+    <!-- Reproductor -->
+    <div class="reproductor">
+        <img id="caratula" class="caratula" src="logo.png" alt="Mayi">
+        <h1 id="titulo" class="titulo">Busca una canción</h1>
+        <p id="artista" class="artista">Mayi Music</p>
+
+        <div class="contenedor-progreso">
+            <input type="range" id="barraProgreso" class="barra-progreso" value="0" step="1" min="0" max="100">
+        </div>
+
+        <button id="botonReproducir" class="boton">Reproducir</button>
+    </div>
 
     <script>
-        // Enlace oculto de la canción en internet
-        const urlOculta = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-        const reproductor = new Audio(urlOculta);
+        const reproductor = new Audio();
         let estaReproduciendo = false;
 
-        const boton = document.getElementById("botonReproducir");
+        // Elementos de la interfaz
+        const inputBusqueda = document.getElementById('inputBusqueda');
+        const contenedorResultados = document.getElementById('contenedorResultados');
+        const caratula = document.getElementById('caratula');
+        const titulo = document.getElementById('titulo');
+        const artista = document.getElementById('artista');
+        const botonReproducir = document.getElementById('botonReproducir');
+        const barraProgreso = document.getElementById('barraProgreso');
 
-        boton.addEventListener("click", () => {
+        // 1. LA BÚSQUEDA SILENCIOSA
+        inputBusqueda.addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                const termino = inputBusqueda.value;
+                if (!termino) return;
+                
+                contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Buscando...</p>";
+                
+                // Conectamos a una API real
+                const respuesta = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termino)}&entity=song&limit=5`);
+                const datos = await respuesta.json();
+                
+                mostrarResultados(datos.results);
+            }
+        });
+
+        // 2. EL MAPEO Y LA INYECCIÓN VISUAL
+        function mostrarResultados(resultados) {
+            contenedorResultados.innerHTML = '';
+            
+            resultados.forEach(item => {
+                // Nuestro Modelo de Datos Unificado
+                const cancion = {
+                    titulo: item.trackName,
+                    artista: item.artistName,
+                    urlCaratula: item.artworkUrl100.replace('100x100', '400x400'), // Pedimos mejor calidad
+                    fuenteDeAudio: item.previewUrl // ¡El enlace oculto!
+                };
+
+                const div = document.createElement('div');
+                div.className = 'item-cancion';
+                div.innerHTML = `
+                    <img src="${cancion.urlCaratula}" class="item-imagen">
+                    <div class="item-textos">
+                        <p class="item-titulo">${cancion.titulo}</p>
+                        <p class="item-artista">${cancion.artista}</p>
+                    </div>
+                `;
+
+                // Al tocar una canción de la lista
+                div.onclick = () => cargarCancion(cancion);
+                contenedorResultados.appendChild(div);
+            });
+        }
+
+        // 3. LA REPRODUCCIÓN OCULTA
+        function cargarCancion(cancion) {
+            // Actualizamos la interfaz
+            titulo.textContent = cancion.titulo;
+            artista.textContent = cancion.artista;
+            caratula.src = cancion.urlCaratula;
+            
+            // Inyectamos el audio real al motor invisible
+            reproductor.src = cancion.fuenteDeAudio;
+            reproductor.play();
+            
+            estaReproduciendo = true;
+            botonReproducir.textContent = "Pausar";
+            contenedorResultados.innerHTML = ''; // Limpiamos la búsqueda
+            inputBusqueda.value = '';
+        }
+
+        // Control del Botón
+        botonReproducir.addEventListener("click", () => {
+            if (!reproductor.src) return; // Si no hay canción cargada, no hace nada
+            
             if (estaReproduciendo) {
                 reproductor.pause();
-                boton.textContent = "Reproducir";
-                estaReproduciendo = false;
+                botonReproducir.textContent = "Reproducir";
             } else {
                 reproductor.play();
-                boton.textContent = "Pausar";
-                estaReproduciendo = true;
+                botonReproducir.textContent = "Pausar";
+            }
+            estaReproduciendo = !estaReproduciendo;
+        });
+
+        // Control de la Barra de Progreso
+        reproductor.addEventListener('timeupdate', () => {
+            if (reproductor.duration) {
+                const porcentaje = (reproductor.currentTime / reproductor.duration) * 100;
+                barraProgreso.value = porcentaje;
+            }
+        });
+
+        // Permitir adelantar la canción arrastrando la barra
+        barraProgreso.addEventListener('input', () => {
+            if (reproductor.duration) {
+                const nuevoTiempo = (barraProgreso.value / 100) * reproductor.duration;
+                reproductor.currentTime = nuevoTiempo;
             }
         });
     </script>
