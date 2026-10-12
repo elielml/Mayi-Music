@@ -142,7 +142,7 @@
             return `${min}:${seg < 10 ? '0' : ''}${seg}`;
         }
 
-        // Función central de búsqueda
+       // Función central de búsqueda mejorada con Puente (Proxy)
         async function realizarBusqueda() {
             const termino = inputBusqueda.value;
             if (!termino) return;
@@ -151,7 +151,12 @@
             contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Buscando canciones...</p>";
             
             try {
-                const respuesta = await fetch(`https://saavn.dev/api/search/songs?query=${encodeURIComponent(termino)}`);
+                // La dirección original de las canciones
+                const urlOriginal = `https://saavn.dev/api/search/songs?query=${encodeURIComponent(termino)}`;
+                // Nuestro puente para evitar el bloqueo del celular
+                const urlPuente = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlOriginal)}`;
+                
+                const respuesta = await fetch(urlPuente);
                 const json = await respuesta.json();
                 
                 if (json.success && json.data.results.length > 0) {
@@ -160,7 +165,8 @@
                     contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>No se encontraron resultados.</p>";
                 }
             } catch (error) {
-                contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Error de conexión. Intenta de nuevo.</p>";
+                // Si el servidor gratuito se cae, mostramos un mensaje claro
+                contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>El servidor de música está saturado en este momento. Intenta de nuevo en unos minutos.</p>";
             }
         }
 
