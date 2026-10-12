@@ -393,8 +393,8 @@
 
         /* Modo Sin Letra: Carátula Grande Centrada */
         .fs-cover-large {
-            width: 240px;
-            height: 240px;
+            width: 220px;
+            height: 220px;
             border-radius: 16px;
             object-fit: cover;
             box-shadow: 0 10px 30px rgba(187, 132, 252, 0.3);
@@ -403,8 +403,8 @@
 
         /* Modo Con Letra: Carátula Miniatura Arriba */
         .fs-cover-small {
-            width: 65px;
-            height: 65px;
+            width: 60px;
+            height: 60px;
             border-radius: 10px;
             object-fit: cover;
             box-shadow: 0 4px 12px rgba(187, 132, 252, 0.2);
@@ -412,7 +412,7 @@
         }
 
         .fs-title {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
@@ -421,12 +421,31 @@
         }
 
         .fs-artist {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
-        /* Caja de letras (Oculta por defecto si no hay letra) */
+        /* Botón '+' para agregar letra cuando no existe */
+        .add-lyrics-btn {
+            background-color: var(--surface-color);
+            border: 1px dashed var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+            transition: background 0.2s;
+        }
+        .add-lyrics-btn:hover {
+            background-color: rgba(187, 134, 252, 0.1);
+        }
+
+        /* Caja de letras dinámica */
         .lyrics-box {
             width: 100%;
             max-width: 500px;
@@ -435,10 +454,10 @@
             padding: 10px 15px;
             text-align: center;
             flex: 1;
-            max-height: calc(100vh - 340px);
+            max-height: calc(100vh - 320px);
             overflow-y: hidden;
             border: 1px solid #333;
-            display: none; /* Se activa con clase */
+            display: none; 
             flex-direction: column;
         }
 
@@ -508,8 +527,8 @@
                 width: 40%;
             }
             .fs-cover-large {
-                width: 190px;
-                height: 190px;
+                width: 170px;
+                height: 170px;
             }
         }
     </style>
@@ -590,11 +609,16 @@
             <span></span>
         </div>
         <div class="fs-content">
-            <!-- Portada dinámica (Grande si no hay letra, Miniatura si hay letra) -->
+            <!-- Portada dinámica -->
             <img id="fs-cover" src="logo.png" class="fs-cover-large" alt="Portada">
             <div class="fs-title" id="fs-title">Sin pista</div>
             <div class="fs-artist" id="fs-artist">Desconocido</div>
             
+            <!-- Botón '+' para agregar letra si no tiene -->
+            <button class="add-lyrics-btn" id="add-lyrics-trigger" onclick="enableLyricsInput()">
+                <span class="material-icons" style="font-size: 18px;">add</span> Agregar Letra
+            </button>
+
             <!-- Caja de letras dinámica -->
             <div class="lyrics-box" id="lyrics-box-container">
                 <div class="lyrics-header">
@@ -602,7 +626,7 @@
                     <span style="cursor:pointer; font-weight:600;" onclick="saveLyrics()">Guardar</span>
                 </div>
                 <div class="lyrics-scroll">
-                    <textarea id="lyrics-input" placeholder="Pega la letra aquí (opcional)..." oninput="updateLyricsLines()"></textarea>
+                    <textarea id="lyrics-input" placeholder="Pega la letra aquí..." oninput="updateLyricsLines()"></textarea>
                 </div>
             </div>
         </div>
@@ -653,6 +677,7 @@
         const fsTimeTotal = document.getElementById('fs-time-total');
         const lyricsInput = document.getElementById('lyrics-input');
         const lyricsBoxContainer = document.getElementById('lyrics-box-container');
+        const addLyricsTrigger = document.getElementById('add-lyrics-trigger');
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedLibrary = localStorage.getItem('mayi_music_library');
@@ -685,7 +710,6 @@
             localStorage.setItem('mayi_music_library', JSON.stringify(dataToSave));
         }
 
-        // --- BORRAR DATOS / BIBLIOTECA ---
         function clearLibrary() {
             if (confirm("¿Estás seguro de que quieres borrar todos los datos guardados de tu biblioteca?")) {
                 localStorage.removeItem('mayi_music_library');
@@ -799,7 +823,6 @@
             }
         }
 
-        // --- ACTUALIZAR VISTA SEGÚN SI TIENE LETRA ---
         function updateTrackUI(track) {
             playerTitle.textContent = track.title;
             playerArtist.textContent = track.artist;
@@ -812,16 +835,23 @@
             lyricsInput.value = track.lyrics || '';
             updateLyricsLines();
 
-            // Lógica visual dinámica: Si hay letra, logo miniatura y caja activa. Si no, logo grande y caja oculta.
             if (track.lyrics && track.lyrics.trim() !== '') {
                 fsCover.className = 'fs-cover-small';
                 lyricsBoxContainer.classList.add('active');
+                addLyricsTrigger.style.display = 'none';
             } else {
                 fsCover.className = 'fs-cover-large';
                 lyricsBoxContainer.classList.remove('active');
+                addLyricsTrigger.style.display = 'flex';
             }
 
             renderLibrary();
+        }
+
+        function enableLyricsInput() {
+            addLyricsTrigger.style.display = 'none';
+            fsCover.className = 'fs-cover-small';
+            lyricsBoxContainer.classList.add('active');
         }
 
         function loadTrack(index) {
@@ -966,8 +996,6 @@
             if (libItem) libItem.lyrics = text;
 
             saveLibraryToLocalStorage();
-            
-            // Actualizar vista inmediatamente al guardar
             updateTrackUI(currentQueue[currentIndex]);
             alert("¡Letra guardada!");
         }
