@@ -123,6 +123,15 @@
             color: white;
         }
 
+        .btn-danger {
+            background-color: #cf6679;
+            color: #000;
+        }
+        .btn-danger:hover {
+            background-color: #b00020;
+            color: white;
+        }
+
         .local-file-wrapper {
             position: relative;
             overflow: hidden;
@@ -269,7 +278,6 @@
             color: var(--text-primary);
         }
 
-        /* Estilo para botón aleatorio activo */
         .main-controls span.shuffle-active {
             color: var(--primary-color) !important;
         }
@@ -339,7 +347,7 @@
             cursor: pointer;
         }
 
-        /* PANTALLA COMPLETA OPTIMIZADA CON LETRAS GRANDES */
+        /* PANTALLA COMPLETA DINÁMICA (CON/SIN LETRA) */
         #fullscreen-player {
             position: fixed;
             top: 0;
@@ -377,22 +385,34 @@
             flex-direction: column;
             align-items: center;
             flex: 1;
-            justify-content: flex-start;
+            justify-content: center;
             text-align: center;
-            gap: 8px;
+            gap: 12px;
             overflow: hidden;
         }
 
-        .fs-cover {
-            width: 70px;
-            height: 70px;
+        /* Modo Sin Letra: Carátula Grande Centrada */
+        .fs-cover-large {
+            width: 240px;
+            height: 240px;
+            border-radius: 16px;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(187, 132, 252, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        /* Modo Con Letra: Carátula Miniatura Arriba */
+        .fs-cover-small {
+            width: 65px;
+            height: 65px;
             border-radius: 10px;
             object-fit: cover;
             box-shadow: 0 4px 12px rgba(187, 132, 252, 0.2);
+            transition: all 0.3s ease;
         }
 
         .fs-title {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
@@ -401,11 +421,12 @@
         }
 
         .fs-artist {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
             margin-bottom: 5px;
         }
 
+        /* Caja de letras (Oculta por defecto si no hay letra) */
         .lyrics-box {
             width: 100%;
             max-width: 500px;
@@ -414,11 +435,15 @@
             padding: 10px 15px;
             text-align: center;
             flex: 1;
-            max-height: calc(100vh - 320px);
+            max-height: calc(100vh - 340px);
             overflow-y: hidden;
             border: 1px solid #333;
-            display: flex;
+            display: none; /* Se activa con clase */
             flex-direction: column;
+        }
+
+        .lyrics-box.active {
+            display: flex;
         }
 
         .lyrics-header {
@@ -482,6 +507,10 @@
             .now-playing {
                 width: 40%;
             }
+            .fs-cover-large {
+                width: 190px;
+                height: 190px;
+            }
         }
     </style>
 </head>
@@ -498,7 +527,7 @@
     <main>
         <div class="controls-section">
             <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                Biblioteca local. Las letras y nombres se recuerdan, selecciona tus archivos si es necesario.
+                Biblioteca local. Tus canciones y letras se guardan automáticamente.
             </p>
             
             <div class="search-bar">
@@ -510,9 +539,11 @@
                     <button class="btn">
                         <span class="material-icons">folder_open</span> Cargar Música
                     </button>
-                    <!-- Permite seleccionar múltiples archivos para reasociar -->
                     <input type="file" id="local-file-input" accept="audio/*" multiple onchange="loadLocalFiles(event)">
                 </div>
+                <button class="btn btn-danger" onclick="clearLibrary()">
+                    <span class="material-icons">delete_sweep</span> Borrar Datos
+                </button>
             </div>
             
             <div id="status-message">Cargando biblioteca...</div>
@@ -551,7 +582,7 @@
         </div>
     </div>
 
-    <!-- PANTALLA COMPLETA OPTIMIZADA CON LETRAS GRANDES Y ALEATORIO -->
+    <!-- PANTALLA COMPLETA DINÁMICA -->
     <div id="fullscreen-player">
         <div class="fs-header">
             <span class="material-icons" onclick="closeFullscreenPlayer()">expand_more</span>
@@ -559,17 +590,19 @@
             <span></span>
         </div>
         <div class="fs-content">
-            <img id="fs-cover" src="logo.png" class="fs-cover" alt="Portada">
+            <!-- Portada dinámica (Grande si no hay letra, Miniatura si hay letra) -->
+            <img id="fs-cover" src="logo.png" class="fs-cover-large" alt="Portada">
             <div class="fs-title" id="fs-title">Sin pista</div>
             <div class="fs-artist" id="fs-artist">Desconocido</div>
             
-            <div class="lyrics-box">
+            <!-- Caja de letras dinámica -->
+            <div class="lyrics-box" id="lyrics-box-container">
                 <div class="lyrics-header">
                     <span>Letra</span>
                     <span style="cursor:pointer; font-weight:600;" onclick="saveLyrics()">Guardar</span>
                 </div>
                 <div class="lyrics-scroll">
-                    <textarea id="lyrics-input" placeholder="Pega la letra aquí..." oninput="updateLyricsLines()"></textarea>
+                    <textarea id="lyrics-input" placeholder="Pega la letra aquí (opcional)..." oninput="updateLyricsLines()"></textarea>
                 </div>
             </div>
         </div>
@@ -619,6 +652,7 @@
         const fsTimeCurrent = document.getElementById('fs-time-current');
         const fsTimeTotal = document.getElementById('fs-time-total');
         const lyricsInput = document.getElementById('lyrics-input');
+        const lyricsBoxContainer = document.getElementById('lyrics-box-container');
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedLibrary = localStorage.getItem('mayi_music_library');
@@ -629,7 +663,6 @@
                     statusMsg.textContent = `${library.length} canciones guardadas. (Carga tu música si faltan rutas de audio)`;
                     renderLibrary();
                     if (library.length > 0) {
-                        // Seleccionamos la primera pero sin asignar audio físico aún hasta que el usuario cargue o seleccione
                         currentIndex = 0;
                         updateTrackUI(library[0]);
                     }
@@ -652,11 +685,28 @@
             localStorage.setItem('mayi_music_library', JSON.stringify(dataToSave));
         }
 
+        // --- BORRAR DATOS / BIBLIOTECA ---
+        function clearLibrary() {
+            if (confirm("¿Estás seguro de que quieres borrar todos los datos guardados de tu biblioteca?")) {
+                localStorage.removeItem('mayi_music_library');
+                library = [];
+                currentQueue = [];
+                currentIndex = -1;
+                audio.pause();
+                audio.src = "";
+                renderLibrary();
+                
+                playerTitle.textContent = "Sin pista";
+                playerArtist.textContent = "Desconocido";
+                playerCover.src = "logo.png";
+                statusMsg.textContent = "Biblioteca vaciada correctamente.";
+            }
+        }
+
         function loadLocalFiles(event) {
             const files = event.target.files;
             if (files.length === 0) return;
 
-            let addedCount = 0;
             for (let file of files) {
                 const url = URL.createObjectURL(file);
                 let rawName = file.name.replace(/\.[^/.]+$/, ""); 
@@ -669,10 +719,9 @@
                     title = parts.slice(1).join("-").trim();
                 }
 
-                // Buscar si ya existe por nombre para actualizar su URL (re-vincular archivo físico)
                 let existing = library.find(t => t.title.toLowerCase() === title.toLowerCase());
                 if (existing) {
-                    existing.url = url; // Actualizamos la ruta física nueva del navegador
+                    existing.url = url; 
                 } else {
                     library.push({
                         id: Date.now() + Math.random(),
@@ -682,12 +731,11 @@
                         cover: 'logo.png',
                         lyrics: '' 
                     });
-                    addedCount++;
                 }
             }
 
             currentQueue = [...library];
-            statusMsg.textContent = `Biblioteca actualizada correctamente. (${library.length} canciones)`;
+            statusMsg.textContent = `Biblioteca actualizada. (${library.length} canciones)`;
             saveLibraryToLocalStorage();
             renderLibrary();
 
@@ -737,7 +785,6 @@
             renderLibrary();
         }
 
-        // --- BOTÓN ALEATORIO (SHUFFLE) INTEGRADO EN CONTROLES ---
         function toggleShuffle() {
             isShuffle = !isShuffle;
             const btn1 = document.getElementById('shuffle-btn-1');
@@ -752,6 +799,7 @@
             }
         }
 
+        // --- ACTUALIZAR VISTA SEGÚN SI TIENE LETRA ---
         function updateTrackUI(track) {
             playerTitle.textContent = track.title;
             playerArtist.textContent = track.artist;
@@ -760,8 +808,19 @@
             fsTitle.textContent = track.title;
             fsArtist.textContent = track.artist;
             fsCover.src = track.cover;
+            
             lyricsInput.value = track.lyrics || '';
             updateLyricsLines();
+
+            // Lógica visual dinámica: Si hay letra, logo miniatura y caja activa. Si no, logo grande y caja oculta.
+            if (track.lyrics && track.lyrics.trim() !== '') {
+                fsCover.className = 'fs-cover-small';
+                lyricsBoxContainer.classList.add('active');
+            } else {
+                fsCover.className = 'fs-cover-large';
+                lyricsBoxContainer.classList.remove('active');
+            }
+
             renderLibrary();
         }
 
@@ -774,7 +833,7 @@
             updateTrackUI(track);
 
             if (!track.url) {
-                alert("El archivo físico de esta canción necesita ser vinculado de nuevo. Por favor, toca el botón 'Cargar Música' y selecciona tus archivos MP3 para activarlos.");
+                alert("El archivo físico de esta canción necesita ser vinculado de nuevo. Toca 'Cargar Música' para seleccionarlo.");
                 return;
             }
 
@@ -828,7 +887,6 @@
 
             let nextIndex;
             if (isShuffle) {
-                // Elegir una canción al azar que no sea la actual
                 nextIndex = Math.floor(Math.random() * currentQueue.length);
                 if (nextIndex === currentIndex && currentQueue.length > 1) {
                     nextIndex = (currentIndex + 1) % currentQueue.length;
@@ -836,7 +894,7 @@
             } else {
                 nextIndex = currentIndex + 1;
                 if (nextIndex >= currentQueue.length) {
-                    nextIndex = 0; // Bucle al inicio
+                    nextIndex = 0;
                 }
             }
 
@@ -902,11 +960,15 @@
             if (currentIndex === -1) return;
             let currentTrackId = currentQueue[currentIndex].id;
             
-            currentQueue[currentIndex].lyrics = lyricsInput.value;
+            let text = lyricsInput.value;
+            currentQueue[currentIndex].lyrics = text;
             let libItem = library.find(t => t.id === currentTrackId);
-            if (libItem) libItem.lyrics = lyricsInput.value;
+            if (libItem) libItem.lyrics = text;
 
             saveLibraryToLocalStorage();
+            
+            // Actualizar vista inmediatamente al guardar
+            updateTrackUI(currentQueue[currentIndex]);
             alert("¡Letra guardada!");
         }
 
