@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Configuración para que se vea como app nativa en celulares -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="logo.png">
+    
+    <title>Mayi Music</title>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            /* Evita que el usuario seleccione el texto por accidente */
+            user-select: none; 
+            -webkit-user-select: none;
+        }
+        .caratula {
+            width: 260px;
+            height: 260px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(225, 48, 108, 0.4);
+        }
+        .titulo {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+            text-align: center;
+        }
+        .artista {
+            font-size: 18px;
+            color: #A0A0A0;
+            margin: 0 0 50px 0;
+        }
+        .boton {
+            background-color: #E1306C;
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .boton:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Aquí cargará la foto de tu esposa que guardes en la carpeta -->
+    <img id="caratula" class="caratula" src="logo.png" alt="Mayi">
+    
+    <h1 id="titulo" class="titulo">Canción para Mayi</h1>
+    <p id="artista" class="artista">Solo para ti</p>
+
+    <button id="botonReproducir" class="boton">Reproducir</button>
+
+    <script>
+        // Enlace oculto de la canción en internet
+        const urlOculta = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+        const reproductor = new Audio(urlOculta);
+        let estaReproduciendo = false;
+
+        const boton = document.getElementById("botonReproducir");
+
+        boton.addEventListener("click", () => {
+            if (estaReproduciendo) {
+                reproductor.pause();
+                boton.textContent = "Reproducir";
+                estaReproduciendo = false;
+            } else {
+                reproductor.play();
+                boton.textContent = "Pausar";
+                estaReproduciendo = true;
+            }
+        });
+    </script>
+</body>
+</html>
