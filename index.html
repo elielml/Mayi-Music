@@ -192,12 +192,8 @@
             border-radius: 8px;
         }
 
-        .track-item:hover, .track-item.active {
+        .track-item:hover {
             background-color: rgba(187, 134, 252, 0.1);
-        }
-
-        .track-item.active {
-            border-left: 4px solid var(--primary-color);
         }
 
         .track-img {
@@ -227,6 +223,23 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .edit-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+        .edit-btn:hover {
+            color: var(--primary-color);
+            background: rgba(255,255,255,0.05);
         }
 
         /* REPRODUCTOR DE MÚSICA FIJO INFERIOR */
@@ -659,7 +672,7 @@
         <div id="section-video" style="display: none;">
             <div class="controls-section">
                 <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                    Reproductor de videos musicales persistente.
+                    Reproductor de videos musicales. Toca el lápiz para renombrar cualquier video.
                 </p>
 
                 <div class="action-row">
@@ -766,7 +779,7 @@
 
     <script>
         const dbName = "MayiMusicDB";
-        const dbVersion = 2; // Actualizado para soportar nombres correctos
+        const dbVersion = 3;
         let db = null;
 
         function initDB() {
@@ -945,14 +958,12 @@
             }
         }
 
-        // --- CORRECCIÓN DE NOMBRES PARA VIDEOS ---
         async function loadLocalVideos(event) {
             const files = event.target.files;
             if (files.length === 0) return;
 
-            videoStatusMsg.textContent = "Guardando videos con su nombre real...";
+            videoStatusMsg.textContent = "Guardando videos...";
             for (let file of files) {
-                // Obtenemos el nombre exacto del archivo sin la extensión
                 let rawName = file.name.replace(/\.[^/.]+$/, ""); 
                 let artist = "Video Musical";
                 let title = rawName;
@@ -982,6 +993,25 @@
             renderVideoLibrary();
         }
 
+        // --- FUNCIÓN PARA EDITAR NOMBRE DE VIDEO ---
+        async function editVideoTitle(event, id) {
+            event.stopPropagation(); // Evita que se abra el video al hacer clic en editar
+            let video = videoLibrary.find(v => v.id === id);
+            if (!video) return;
+
+            let newTitle = prompt("Escribe el nombre correcto para este video:", video.title);
+            if (newTitle !== null && newTitle.trim() !== "") {
+                video.title = newTitle.trim();
+                await saveFileToDB("videos", {
+                    id: video.id,
+                    title: video.title,
+                    artist: video.artist,
+                    blob: video.blob
+                });
+                renderVideoLibrary();
+            }
+        }
+
         function renderVideoLibrary() {
             videoPlaylistEl.innerHTML = '';
             if (videoLibrary.length === 0) {
@@ -1002,6 +1032,9 @@
                         <div class="track-title-list">${video.title}</div>
                         <div class="track-artist-list">${video.artist}</div>
                     </div>
+                    <button class="edit-btn" onclick="editVideoTitle(event, ${video.id})" title="Cambiar nombre">
+                        <span class="material-icons">edit</span>
+                    </button>
                 `;
                 videoPlaylistEl.appendChild(li);
             });
