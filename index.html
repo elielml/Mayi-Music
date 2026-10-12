@@ -339,7 +339,7 @@
             cursor: pointer;
         }
 
-        /* PANTALLA COMPLETA DE REPRODUCCIÓN (MODAL) */
+        /* PANTALLA COMPLETA OPTIMIZADA (LETRA GRANDE Y LOGO MINIATURA) */
         #fullscreen-player {
             position: fixed;
             top: 0;
@@ -351,7 +351,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 30px 20px;
+            padding: 15px 20px 20px 20px;
             transform: translateY(100%);
             transition: transform 0.3s ease-in-out;
         }
@@ -364,11 +364,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 5px;
         }
 
         .fs-header span {
             cursor: pointer;
-            font-size: 30px;
+            font-size: 28px;
         }
 
         .fs-content {
@@ -376,39 +377,46 @@
             flex-direction: column;
             align-items: center;
             flex: 1;
-            justify-content: center;
+            justify-content: flex-start;
             text-align: center;
-            gap: 15px;
-            overflow-y: auto;
-            padding: 10px 0;
+            gap: 8px;
+            overflow: hidden;
         }
 
+        /* Logo en miniatura centralizado arriba */
         .fs-cover {
-            width: 200px;
-            height: 200px;
-            border-radius: 16px;
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
             object-fit: cover;
-            box-shadow: 0 10px 30px rgba(187, 132, 252, 0.3);
+            box-shadow: 0 4px 12px rgba(187, 132, 252, 0.2);
         }
 
         .fs-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90%;
         }
 
         .fs-artist {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
+            margin-bottom: 5px;
         }
 
+        /* Caja de letras ampliada que ocupa gran espacio central */
         .lyrics-box {
             width: 100%;
             max-width: 500px;
             background: var(--surface-color);
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px 15px;
             text-align: center;
-            height: 130px;
+            flex: 1;
+            max-height: calc(100vh - 320px);
             overflow-y: hidden;
             border: 1px solid #333;
             display: flex;
@@ -428,8 +436,8 @@
             flex: 1;
             overflow-y: auto;
             scroll-behavior: smooth;
-            padding: 10px;
-            font-size: 0.95rem;
+            padding: 5px;
+            font-size: 1rem;
             line-height: 1.6;
             color: var(--text-secondary);
             white-space: pre-line;
@@ -443,7 +451,8 @@
             color: white;
             resize: none;
             outline: none;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            line-height: 1.6;
             text-align: center;
         }
 
@@ -453,7 +462,8 @@
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
+            padding-top: 5px;
         }
 
         #status-message {
@@ -473,10 +483,6 @@
             }
             .now-playing {
                 width: 45%;
-            }
-            .fs-cover {
-                width: 160px;
-                height: 160px;
             }
         }
     </style>
@@ -548,25 +554,27 @@
         </div>
     </div>
 
-    <!-- PANTALLA COMPLETA / MODAL CON LETRAS SINCRONIZADAS -->
+    <!-- PANTALLA COMPLETA OPTIMIZADA CON LETRAS GRANDES -->
     <div id="fullscreen-player">
         <div class="fs-header">
             <span class="material-icons" onclick="closeFullscreenPlayer()">expand_more</span>
-            <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-secondary);">REPRODUCIENDO</span>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">REPRODUCIENDO</span>
             <span></span>
         </div>
         <div class="fs-content">
+            <!-- Logo miniatura y datos compactos arriba -->
             <img id="fs-cover" src="logo.png" class="fs-cover" alt="Portada">
             <div class="fs-title" id="fs-title">Sin pista</div>
             <div class="fs-artist" id="fs-artist">Desconocido</div>
             
+            <!-- Caja de letras expandida para ocupar el espacio central -->
             <div class="lyrics-box">
                 <div class="lyrics-header">
                     <span>Letra</span>
                     <span style="cursor:pointer; font-weight:600;" onclick="saveLyrics()">Guardar</span>
                 </div>
                 <div class="lyrics-scroll">
-                    <textarea id="lyrics-input" placeholder="Pega la letra de la canción aquí..." oninput="updateLyricsLines()"></textarea>
+                    <textarea id="lyrics-input" placeholder="Pega la letra aquí..." oninput="updateLyricsLines()"></textarea>
                 </div>
             </div>
         </div>
@@ -576,10 +584,10 @@
                 <input type="range" class="progress-bar" id="fs-seek-bar" value="0" step="1" onchange="seekTrack()" oninput="updateSeekTime()">
                 <span id="fs-time-total">0:00</span>
             </div>
-            <div class="main-controls" style="justify-content: center; gap: 40px; margin-bottom: 15px;">
-                <span class="material-icons" onclick="prevTrack()" style="font-size: 36px;">skip_previous</span>
-                <span class="material-icons play-btn" id="fs-play-pause-btn" onclick="togglePlay()" style="font-size: 56px;">play_circle_filled</span>
-                <span class="material-icons" onclick="nextTrack()" style="font-size: 36px;">skip_next</span>
+            <div class="main-controls" style="justify-content: center; gap: 35px; margin-bottom: 5px;">
+                <span class="material-icons" onclick="prevTrack()" style="font-size: 32px;">skip_previous</span>
+                <span class="material-icons play-btn" id="fs-play-pause-btn" onclick="togglePlay()" style="font-size: 48px;">play_circle_filled</span>
+                <span class="material-icons" onclick="nextTrack()" style="font-size: 32px;">skip_next</span>
             </div>
         </div>
     </div>
@@ -616,7 +624,6 @@
         const fsTimeTotal = document.getElementById('fs-time-total');
         const lyricsInput = document.getElementById('lyrics-input');
 
-        // --- CARGAR BIBLIOTECA DESDE LOCALSTORAGE AL INICIAR ---
         window.addEventListener('DOMContentLoaded', () => {
             const savedLibrary = localStorage.getItem('mayi_music_library');
             if (savedLibrary) {
@@ -637,7 +644,6 @@
         });
 
         function saveLibraryToLocalStorage() {
-            // Guardamos metadatos y letras (las URLs de objetos blob se regeneran al recargar archivos locales)
             const dataToSave = library.map(t => ({
                 id: t.id,
                 title: t.title,
@@ -648,7 +654,6 @@
             localStorage.setItem('mayi_music_library', JSON.stringify(dataToSave));
         }
 
-        // --- GESTIÓN DE ARCHIVOS LOCALES ---
         function loadLocalFiles(event) {
             const files = event.target.files;
             if (files.length === 0) return;
@@ -665,7 +670,6 @@
                     title = parts.slice(1).join("-").trim();
                 }
 
-                // Evitar duplicados exactos
                 if (!library.some(t => t.title === title && t.artist === artist)) {
                     library.push({
                         id: Date.now() + Math.random(),
@@ -818,7 +822,6 @@
             }
         }
 
-        // --- SINCRONIZACIÓN DE LETRAS AUTOMÁTICA ---
         function updateLyricsLines() {
             let text = lyricsInput.value;
             lyricLines = text.split('\n').filter(line => line.trim() !== '');
@@ -840,14 +843,12 @@
             fsTimeCurrent.textContent = formattedCur;
             fsTimeTotal.textContent = formattedTot;
 
-            // Subir la letra progresivamente acorde al tiempo de la canción
             if (lyricLines.length > 0 && audio.duration > 0) {
                 let progressRatio = audio.currentTime / audio.duration;
                 let targetIndex = Math.floor(progressRatio * lyricLines.length);
                 if (targetIndex >= lyricLines.length) targetIndex = lyricLines.length - 1;
                 
-                // Desplazar el textarea automáticamente hacia la línea correspondiente
-                let lineHeight = 22; // altura estimada de cada línea en píxeles
+                let lineHeight = 28; 
                 lyricsInput.scrollTop = targetIndex * lineHeight;
             }
         });
