@@ -10,58 +10,27 @@
     
     <style>
         body {
-            margin: 0;
-            padding: 20px;
-            background-color: #121212;
-            color: white;
+            margin: 0; padding: 20px; background-color: #121212; color: white;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            box-sizing: border-box;
-            user-select: none; 
-            -webkit-user-select: none;
+            display: flex; flex-direction: column; align-items: center; height: 100vh;
+            box-sizing: border-box; user-select: none; -webkit-user-select: none;
         }
         
-        /* --- NUEVO DISEÑO DEL BUSCADOR --- */
-        .contenedor-busqueda { 
-            display: flex; 
-            gap: 10px; 
-            width: 100%; 
-            max-width: 400px; 
-            margin-bottom: 15px; 
-            margin-top: 10px; 
-        }
+        .contenedor-busqueda { display: flex; gap: 10px; width: 100%; max-width: 400px; margin-bottom: 15px; margin-top: 10px; }
         .input-busqueda {
-            flex-grow: 1; 
-            padding: 15px; 
-            border-radius: 25px; 
-            border: none;
-            background-color: #282828; 
-            color: white; 
-            font-size: 16px; 
-            outline: none;
+            flex-grow: 1; padding: 15px; border-radius: 25px; border: none;
+            background-color: #282828; color: white; font-size: 16px; outline: none;
         }
         .boton-lupa {
-            background-color: #E1306C;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-color: #E1306C; border: none; border-radius: 50%; width: 50px; height: 50px;
+            color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
         .boton-lupa:active { transform: scale(0.95); }
         
         .resultados { width: 100%; max-width: 400px; max-height: 180px; overflow-y: auto; margin-bottom: 20px; }
         .item-cancion {
-            display: flex; align-items: center; padding: 10px;
-            background-color: #181818; margin-bottom: 5px; border-radius: 10px; cursor: pointer;
+            display: flex; align-items: center; padding: 10px; background-color: #181818; 
+            margin-bottom: 5px; border-radius: 10px; cursor: pointer;
         }
         .item-cancion:active { background-color: #282828; }
         .item-imagen { width: 45px; height: 45px; border-radius: 5px; margin-right: 15px; object-fit: cover; }
@@ -77,14 +46,13 @@
             width: 280px; height: 280px; border-radius: 20px; margin-bottom: 30px;
             object-fit: cover; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
-        .titulo { font-size: 24px; font-weight: bold; margin: 0 0 5px 0; text-align: center; }
-        .artista { font-size: 16px; color: #A0A0A0; margin: 0 0 30px 0; text-align: center; }
+        .titulo { font-size: 22px; font-weight: bold; margin: 0 0 5px 0; text-align: center; }
+        .artista { font-size: 14px; color: #A0A0A0; margin: 0 0 30px 0; text-align: center; }
         
         .contenedor-progreso { width: 100%; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
         .tiempo { font-size: 12px; color: #A0A0A0; width: 40px; text-align: center; }
         .barra-progreso {
-            flex-grow: 1; appearance: none; height: 6px; background: #404040;
-            border-radius: 5px; outline: none;
+            flex-grow: 1; appearance: none; height: 6px; background: #404040; border-radius: 5px; outline: none;
         }
         .barra-progreso::-webkit-slider-thumb {
             appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #E1306C; cursor: pointer;
@@ -95,12 +63,15 @@
             border-radius: 30px; font-size: 20px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
         }
         .boton:active { transform: scale(0.95); }
+        
+        /* Contenedor invisible para YouTube */
+        #reproductor-youtube { display: none; }
     </style>
 </head>
 <body>
 
     <div class="contenedor-busqueda">
-        <input type="text" id="inputBusqueda" class="input-busqueda" placeholder="Buscar canción completa...">
+        <input type="text" id="inputBusqueda" class="input-busqueda" placeholder="Buscar en YouTube...">
         <button id="botonBuscar" class="boton-lupa">🔍</button>
     </div>
 
@@ -109,7 +80,7 @@
     <div class="reproductor">
         <img id="caratula" class="caratula" src="logo.png" alt="Mayi Music">
         <h1 id="titulo" class="titulo">Mayi Music</h1>
-        <p id="artista" class="artista">Buscador Activo</p>
+        <p id="artista" class="artista">Conectado a YouTube</p>
 
         <div class="contenedor-progreso">
             <span id="tiempoActual" class="tiempo">0:00</span>
@@ -120,10 +91,11 @@
         <button id="botonReproducir" class="boton">Reproducir</button>
     </div>
 
-    <script>
-        const reproductor = new Audio();
-        let estaReproduciendo = false;
+    <!-- Div donde YouTube cargará el video de forma invisible -->
+    <div id="reproductor-youtube"></div>
 
+    <script>
+        // Variables de la interfaz
         const inputBusqueda = document.getElementById('inputBusqueda');
         const botonBuscar = document.getElementById('botonBuscar');
         const contenedorResultados = document.getElementById('contenedorResultados');
@@ -135,6 +107,28 @@
         const txtTiempoActual = document.getElementById('tiempoActual');
         const txtTiempoTotal = document.getElementById('tiempoTotal');
 
+        let reproductorYT;
+        let estaReproduciendo = false;
+        let intervaloProgreso;
+
+        // 1. CARGAR LA API OFICIAL DE YOUTUBE
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            reproductorYT = new YT.Player('reproductor-youtube', {
+                height: '0',
+                width: '0',
+                videoId: '',
+                playerVars: { 'playsinline': 1 },
+                events: {
+                    'onStateChange': alCambiarEstado
+                }
+            });
+        }
+
         function formatearTiempo(segundos) {
             if (isNaN(segundos)) return "0:00";
             const min = Math.floor(segundos / 60);
@@ -142,55 +136,50 @@
             return `${min}:${seg < 10 ? '0' : ''}${seg}`;
         }
 
-       // Función central de búsqueda mejorada con Puente (Proxy)
+        // 2. BUSCADOR DE YOUTUBE (Usando un proxy abierto y gratuito)
         async function realizarBusqueda() {
             const termino = inputBusqueda.value;
             if (!termino) return;
             
-            inputBusqueda.blur(); // Oculta el teclado
-            contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Buscando canciones...</p>";
+            inputBusqueda.blur();
+            contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Buscando en YouTube...</p>";
             
             try {
-                // La dirección original de las canciones
-                const urlOriginal = `https://saavn.dev/api/search/songs?query=${encodeURIComponent(termino)}`;
-                // Nuestro puente para evitar el bloqueo del celular
-                const urlPuente = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlOriginal)}`;
-                
-                const respuesta = await fetch(urlPuente);
+                // Usamos la API pública de Piped (un puente hacia YouTube)
+                const respuesta = await fetch(`https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(termino + ' audio oficial')}&filter=music_songs`);
                 const json = await respuesta.json();
                 
-                if (json.success && json.data.results.length > 0) {
-                    mostrarResultados(json.data.results);
+                if (json.items && json.items.length > 0) {
+                    mostrarResultados(json.items);
                 } else {
                     contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>No se encontraron resultados.</p>";
                 }
             } catch (error) {
-                // Si el servidor gratuito se cae, mostramos un mensaje claro
-                contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>El servidor de música está saturado en este momento. Intenta de nuevo en unos minutos.</p>";
+                contenedorResultados.innerHTML = "<p style='text-align:center; color:#A0A0A0;'>Error al conectar con YouTube. Intenta de nuevo.</p>";
             }
         }
 
-        // Activamos la búsqueda tanto con el botón de la lupa como con el teclado
         botonBuscar.addEventListener('click', realizarBusqueda);
         inputBusqueda.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') realizarBusqueda();
         });
 
+        // 3. MAPEO Y RESULTADOS
         function mostrarResultados(resultados) {
             contenedorResultados.innerHTML = '';
             
             resultados.slice(0, 5).forEach(item => {
-                const mejorImagen = item.image && item.image.length > 0 ? item.image[item.image.length - 1].url : 'logo.png';
-                const mejorAudio = item.downloadUrl && item.downloadUrl.length > 0 ? item.downloadUrl[item.downloadUrl.length - 1].url : '';
+                // Extraemos el ID del video de YouTube (ej: /watch?v=ABCDEFG)
+                const videoId = item.url.split('v=')[1];
 
                 const cancion = {
-                    titulo: item.name,
-                    artista: item.primaryArtists || "Artista",
-                    urlCaratula: mejorImagen,
-                    fuenteDeAudio: mejorAudio
+                    id: videoId,
+                    titulo: item.title,
+                    artista: item.uploaderName || "YouTube Music",
+                    urlCaratula: item.thumbnail || 'logo.png'
                 };
 
-                if (!cancion.fuenteDeAudio) return;
+                if (!cancion.id) return;
 
                 const div = document.createElement('div');
                 div.className = 'item-cancion';
@@ -207,54 +196,74 @@
             });
         }
 
+        // 4. CONTROL DEL REPRODUCTOR INVISIBLE DE YOUTUBE
         function cargarCancion(cancion) {
             titulo.textContent = cancion.titulo;
             artista.textContent = cancion.artista;
             caratula.src = cancion.urlCaratula;
             
-            reproductor.src = cancion.fuenteDeAudio;
-            reproductor.play();
+            // Le pasamos el ID a YouTube y le decimos que inicie
+            reproductorYT.loadVideoById(cancion.id);
             
             estaReproduciendo = true;
             botonReproducir.textContent = "Pausar";
             contenedorResultados.innerHTML = ''; 
             inputBusqueda.value = '';
+            
+            iniciarBarraProgreso();
         }
 
         botonReproducir.addEventListener("click", () => {
-            if (!reproductor.src) return; 
+            if (!reproductorYT || !reproductorYT.getPlayerState) return;
             
-            if (estaReproduciendo) {
-                reproductor.pause();
+            const estado = reproductorYT.getPlayerState();
+            
+            // Si está sonando (estado 1), pausamos
+            if (estado === 1) {
+                reproductorYT.pauseVideo();
                 botonReproducir.textContent = "Reproducir";
+                estaReproduciendo = false;
             } else {
-                reproductor.play();
+                reproductorYT.playVideo();
                 botonReproducir.textContent = "Pausar";
-            }
-            estaReproduciendo = !estaReproduciendo;
-        });
-
-        reproductor.addEventListener('ended', () => {
-            botonReproducir.textContent = "Reproducir";
-            estaReproduciendo = false;
-            barraProgreso.value = 0;
-            txtTiempoActual.textContent = "0:00";
-        });
-
-        reproductor.addEventListener('timeupdate', () => {
-            if (reproductor.duration) {
-                const porcentaje = (reproductor.currentTime / reproductor.duration) * 100;
-                barraProgreso.value = porcentaje;
-                
-                txtTiempoActual.textContent = formatearTiempo(reproductor.currentTime);
-                txtTiempoTotal.textContent = formatearTiempo(reproductor.duration);
+                estaReproduciendo = true;
             }
         });
 
+        // Eventos de YouTube (cuando termina la canción)
+        function alCambiarEstado(evento) {
+            if (evento.data === YT.PlayerState.ENDED) {
+                botonReproducir.textContent = "Reproducir";
+                estaReproduciendo = false;
+                barraProgreso.value = 0;
+                txtTiempoActual.textContent = "0:00";
+            }
+        }
+
+        // Actualizar la barra de progreso a mano porque YouTube no tiene evento 'timeupdate'
+        function iniciarBarraProgreso() {
+            clearInterval(intervaloProgreso);
+            intervaloProgreso = setInterval(() => {
+                if (reproductorYT && reproductorYT.getCurrentTime && estaReproduciendo) {
+                    const tiempoActual = reproductorYT.getCurrentTime();
+                    const tiempoTotal = reproductorYT.getDuration();
+                    
+                    if (tiempoTotal > 0) {
+                        const porcentaje = (tiempoActual / tiempoTotal) * 100;
+                        barraProgreso.value = porcentaje;
+                        
+                        txtTiempoActual.textContent = formatearTiempo(tiempoActual);
+                        txtTiempoTotal.textContent = formatearTiempo(tiempoTotal);
+                    }
+                }
+            }, 1000); // Se actualiza cada segundo
+        }
+
+        // Permitir adelantar la canción arrastrando la barra
         barraProgreso.addEventListener('input', () => {
-            if (reproductor.duration) {
-                const nuevoTiempo = (barraProgreso.value / 100) * reproductor.duration;
-                reproductor.currentTime = nuevoTiempo;
+            if (reproductorYT && reproductorYT.getDuration) {
+                const nuevoTiempo = (barraProgreso.value / 100) * reproductorYT.getDuration();
+                reproductorYT.seekTo(nuevoTiempo, true);
             }
         });
     </script>
