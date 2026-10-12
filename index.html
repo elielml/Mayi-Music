@@ -630,7 +630,7 @@
         <div id="section-music">
             <div class="controls-section">
                 <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                    Biblioteca musical permanente. Los archivos se guardan en la memoria interna de la app.
+                    Biblioteca musical permanente.
                 </p>
                 
                 <div class="search-bar">
@@ -765,9 +765,8 @@
     </div>
 
     <script>
-        // --- BASE DE DATOS INTERNA (IndexedDB) PARA GUARDAR ARCHIVOS FÍSICOS PERMANENTEMENTE ---
         const dbName = "MayiMusicDB";
-        const dbVersion = 1;
+        const dbVersion = 2; // Actualizado para soportar nombres correctos
         let db = null;
 
         function initDB() {
@@ -823,7 +822,6 @@
             });
         }
 
-        // --- NAVEGACIÓN ---
         function switchMainTab(tab) {
             const musicSection = document.getElementById('section-music');
             const videoSection = document.getElementById('section-video');
@@ -890,15 +888,14 @@
             try {
                 await initDB();
                 
-                // Cargar Música guardada permanentemente
                 const savedMusic = await getAllFilesFromDB("music");
                 if (savedMusic && savedMusic.length > 0) {
                     library = savedMusic.map(item => ({
                         ...item,
-                        url: URL.createObjectURL(item.blob) // Creamos enlace interno desde el archivo guardado
+                        url: URL.createObjectURL(item.blob)
                     }));
                     currentQueue = [...library];
-                    statusMsg.textContent = `${library.length} canciones cargadas desde la memoria interna.`;
+                    statusMsg.textContent = `${library.length} canciones cargadas.`;
                     renderLibrary();
                     if (library.length > 0) {
                         currentIndex = 0;
@@ -908,22 +905,20 @@
                     statusMsg.textContent = "Biblioteca musical vacía.";
                 }
 
-                // Cargar Videos guardados permanentemente
                 const savedVideos = await getAllFilesFromDB("videos");
                 if (savedVideos && savedVideos.length > 0) {
                     videoLibrary = savedVideos.map(item => ({
                         ...item,
                         url: URL.createObjectURL(item.blob)
                     }));
-                    videoStatusMsg.textContent = `${videoLibrary.length} videos cargados desde la memoria interna.`;
+                    videoStatusMsg.textContent = `${videoLibrary.length} videos cargados.`;
                     renderVideoLibrary();
                 } else {
                     videoStatusMsg.textContent = "Biblioteca de videos vacía.";
                 }
 
             } catch(e) {
-                console.error("Error al iniciar almacenamiento persistente", e);
-                statusMsg.textContent = "Error al cargar la memoria interna.";
+                console.error(e);
             }
         });
 
@@ -950,13 +945,14 @@
             }
         }
 
-        // --- CARGAR Y GUARDAR ARCHIVOS DE VIDEO EN LA DB ---
+        // --- CORRECCIÓN DE NOMBRES PARA VIDEOS ---
         async function loadLocalVideos(event) {
             const files = event.target.files;
             if (files.length === 0) return;
 
-            videoStatusMsg.textContent = "Guardando videos en memoria interna...";
+            videoStatusMsg.textContent = "Guardando videos con su nombre real...";
             for (let file of files) {
+                // Obtenemos el nombre exacto del archivo sin la extensión
                 let rawName = file.name.replace(/\.[^/.]+$/, ""); 
                 let artist = "Video Musical";
                 let title = rawName;
@@ -971,7 +967,7 @@
                     id: Date.now() + Math.random(),
                     title: title,
                     artist: artist,
-                    blob: file // Guardamos el archivo binario real
+                    blob: file
                 };
 
                 await saveFileToDB("videos", videoItem);
@@ -1026,12 +1022,11 @@
             videoModal.classList.remove('open');
         }
 
-        // --- CARGAR Y GUARDAR MÚSICA EN LA DB ---
         async function loadLocalFiles(event) {
             const files = event.target.files;
             if (files.length === 0) return;
 
-            statusMsg.textContent = "Guardando canciones en memoria interna...";
+            statusMsg.textContent = "Guardando canciones...";
             for (let file of files) {
                 let rawName = file.name.replace(/\.[^/.]+$/, ""); 
                 let artist = "Desconocido";
@@ -1049,7 +1044,7 @@
                     artist: artist,
                     cover: 'logo.png',
                     lyrics: '',
-                    blob: file // Guardamos el archivo binario real permanentemente
+                    blob: file
                 };
 
                 await saveFileToDB("music", trackItem);
@@ -1293,7 +1288,6 @@
             let libItem = library.find(t => t.id === currentTrack.id);
             if (libItem) libItem.lyrics = text;
 
-            // Actualizamos permanentemente en la base de datos interna
             await saveFileToDB("music", {
                 id: currentTrack.id,
                 title: currentTrack.title,
@@ -1312,7 +1306,7 @@
             fsPlayer.classList.add('open');
         }
 
-        function closeFullscreenParser() {
+        function closeFullscreenPlayer() {
             fsPlayer.classList.remove('open');
         }
 
