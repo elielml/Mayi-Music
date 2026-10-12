@@ -123,11 +123,6 @@
             color: white;
         }
 
-        .btn-secondary {
-            background-color: #333;
-            color: white;
-        }
-
         .local-file-wrapper {
             position: relative;
             overflow: hidden;
@@ -206,7 +201,7 @@
             display: flex;
             align-items: center;
             padding: 0 20px;
-            gap: 20px;
+            gap: 15px;
             box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
             z-index: 1000;
         }
@@ -258,7 +253,7 @@
         .main-controls {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 5px;
             user-select: none;
         }
@@ -267,16 +262,21 @@
             cursor: pointer;
             color: var(--text-secondary);
             transition: color 0.2s;
-            font-size: 32px;
+            font-size: 28px;
         }
 
         .main-controls span:hover {
-            color: var(--primary-color);
+            color: var(--text-primary);
+        }
+
+        /* Estilo para botón aleatorio activo */
+        .main-controls span.shuffle-active {
+            color: var(--primary-color) !important;
         }
 
         .main-controls .play-btn {
             color: var(--text-primary);
-            font-size: 42px;
+            font-size: 38px;
         }
 
         .progress-container {
@@ -310,7 +310,7 @@
         }
 
         .volume-container {
-            width: 20%;
+            width: 15%;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -319,7 +319,7 @@
         }
 
         .volume-bar {
-            width: 100px;
+            width: 80px;
             -webkit-appearance: none;
             appearance: none;
             height: 4px;
@@ -339,7 +339,7 @@
             cursor: pointer;
         }
 
-        /* PANTALLA COMPLETA OPTIMIZADA (LETRA GRANDE Y LOGO MINIATURA) */
+        /* PANTALLA COMPLETA OPTIMIZADA CON LETRAS GRANDES */
         #fullscreen-player {
             position: fixed;
             top: 0;
@@ -383,7 +383,6 @@
             overflow: hidden;
         }
 
-        /* Logo en miniatura centralizado arriba */
         .fs-cover {
             width: 70px;
             height: 70px;
@@ -407,7 +406,6 @@
             margin-bottom: 5px;
         }
 
-        /* Caja de letras ampliada que ocupa gran espacio central */
         .lyrics-box {
             width: 100%;
             max-width: 500px;
@@ -482,7 +480,7 @@
                 display: none;
             }
             .now-playing {
-                width: 45%;
+                width: 40%;
             }
         }
     </style>
@@ -500,7 +498,7 @@
     <main>
         <div class="controls-section">
             <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                Biblioteca local. Tu música se guarda automáticamente en este navegador.
+                Biblioteca local. Las letras y nombres se recuerdan, selecciona tus archivos si es necesario.
             </p>
             
             <div class="search-bar">
@@ -512,11 +510,9 @@
                     <button class="btn">
                         <span class="material-icons">folder_open</span> Cargar Música
                     </button>
+                    <!-- Permite seleccionar múltiples archivos para reasociar -->
                     <input type="file" id="local-file-input" accept="audio/*" multiple onchange="loadLocalFiles(event)">
                 </div>
-                <button class="btn btn-secondary" onclick="toggleShuffle()">
-                    <span class="material-icons" id="shuffle-icon">shuffle</span> Aleatorio
-                </button>
             </div>
             
             <div id="status-message">Cargando biblioteca...</div>
@@ -537,9 +533,10 @@
 
         <div class="player-controls-container">
             <div class="main-controls">
-                <span class="material-icons" onclick="prevTrack()">skip_previous</span>
-                <span class="material-icons play-btn" id="play-pause-btn" onclick="togglePlay()">play_circle_filled</span>
-                <span class="material-icons" onclick="nextTrack()">skip_next</span>
+                <span class="material-icons" id="shuffle-btn-1" onclick="toggleShuffle()" title="Aleatorio">shuffle</span>
+                <span class="material-icons" onclick="prevTrack()" title="Anterior">skip_previous</span>
+                <span class="material-icons play-btn" id="play-pause-btn" onclick="togglePlay()" title="Reproducir/Pausar">play_circle_filled</span>
+                <span class="material-icons" onclick="nextTrack()" title="Siguiente">skip_next</span>
             </div>
             <div class="progress-container">
                 <span id="time-current">0:00</span>
@@ -554,7 +551,7 @@
         </div>
     </div>
 
-    <!-- PANTALLA COMPLETA OPTIMIZADA CON LETRAS GRANDES -->
+    <!-- PANTALLA COMPLETA OPTIMIZADA CON LETRAS GRANDES Y ALEATORIO -->
     <div id="fullscreen-player">
         <div class="fs-header">
             <span class="material-icons" onclick="closeFullscreenPlayer()">expand_more</span>
@@ -562,12 +559,10 @@
             <span></span>
         </div>
         <div class="fs-content">
-            <!-- Logo miniatura y datos compactos arriba -->
             <img id="fs-cover" src="logo.png" class="fs-cover" alt="Portada">
             <div class="fs-title" id="fs-title">Sin pista</div>
             <div class="fs-artist" id="fs-artist">Desconocido</div>
             
-            <!-- Caja de letras expandida para ocupar el espacio central -->
             <div class="lyrics-box">
                 <div class="lyrics-header">
                     <span>Letra</span>
@@ -584,10 +579,11 @@
                 <input type="range" class="progress-bar" id="fs-seek-bar" value="0" step="1" onchange="seekTrack()" oninput="updateSeekTime()">
                 <span id="fs-time-total">0:00</span>
             </div>
-            <div class="main-controls" style="justify-content: center; gap: 35px; margin-bottom: 5px;">
-                <span class="material-icons" onclick="prevTrack()" style="font-size: 32px;">skip_previous</span>
-                <span class="material-icons play-btn" id="fs-play-pause-btn" onclick="togglePlay()" style="font-size: 48px;">play_circle_filled</span>
-                <span class="material-icons" onclick="nextTrack()" style="font-size: 32px;">skip_next</span>
+            <div class="main-controls" style="justify-content: center; gap: 25px; margin-bottom: 5px;">
+                <span class="material-icons" id="shuffle-btn-2" onclick="toggleShuffle()" style="font-size: 26px;" title="Aleatorio">shuffle</span>
+                <span class="material-icons" onclick="prevTrack()" style="font-size: 30px;" title="Anterior">skip_previous</span>
+                <span class="material-icons play-btn" id="fs-play-pause-btn" onclick="togglePlay()" style="font-size: 44px;" title="Reproducir/Pausar">play_circle_filled</span>
+                <span class="material-icons" onclick="nextTrack()" style="font-size: 30px;" title="Siguiente">skip_next</span>
             </div>
         </div>
     </div>
@@ -630,10 +626,12 @@
                 try {
                     library = JSON.parse(savedLibrary);
                     currentQueue = [...library];
-                    statusMsg.textContent = `${library.length} canciones guardadas en tu biblioteca.`;
+                    statusMsg.textContent = `${library.length} canciones guardadas. (Carga tu música si faltan rutas de audio)`;
                     renderLibrary();
                     if (library.length > 0) {
-                        loadTrack(0);
+                        // Seleccionamos la primera pero sin asignar audio físico aún hasta que el usuario cargue o seleccione
+                        currentIndex = 0;
+                        updateTrackUI(library[0]);
                     }
                 } catch(e) {
                     console.error("Error al cargar biblioteca guardada", e);
@@ -658,6 +656,7 @@
             const files = event.target.files;
             if (files.length === 0) return;
 
+            let addedCount = 0;
             for (let file of files) {
                 const url = URL.createObjectURL(file);
                 let rawName = file.name.replace(/\.[^/.]+$/, ""); 
@@ -670,7 +669,11 @@
                     title = parts.slice(1).join("-").trim();
                 }
 
-                if (!library.some(t => t.title === title && t.artist === artist)) {
+                // Buscar si ya existe por nombre para actualizar su URL (re-vincular archivo físico)
+                let existing = library.find(t => t.title.toLowerCase() === title.toLowerCase());
+                if (existing) {
+                    existing.url = url; // Actualizamos la ruta física nueva del navegador
+                } else {
                     library.push({
                         id: Date.now() + Math.random(),
                         title: title,
@@ -679,11 +682,12 @@
                         cover: 'logo.png',
                         lyrics: '' 
                     });
+                    addedCount++;
                 }
             }
 
             currentQueue = [...library];
-            statusMsg.textContent = `${library.length} canciones en tu biblioteca.`;
+            statusMsg.textContent = `Biblioteca actualizada correctamente. (${library.length} canciones)`;
             saveLibraryToLocalStorage();
             renderLibrary();
 
@@ -733,32 +737,22 @@
             renderLibrary();
         }
 
+        // --- BOTÓN ALEATORIO (SHUFFLE) INTEGRADO EN CONTROLES ---
         function toggleShuffle() {
             isShuffle = !isShuffle;
-            const btnIcon = document.getElementById('shuffle-icon');
+            const btn1 = document.getElementById('shuffle-btn-1');
+            const btn2 = document.getElementById('shuffle-btn-2');
+
             if (isShuffle) {
-                btnIcon.parentElement.style.backgroundColor = 'var(--primary-color)';
-                btnIcon.parentElement.style.color = '#000';
-                currentQueue = [...library].sort(() => Math.random() - 0.5);
+                btn1.classList.add('shuffle-active');
+                btn2.classList.add('shuffle-active');
             } else {
-                btnIcon.parentElement.style.backgroundColor = '#333';
-                btnIcon.parentElement.style.color = 'white';
-                currentQueue = [...library];
+                btn1.classList.remove('shuffle-active');
+                btn2.classList.remove('shuffle-active');
             }
-            renderLibrary();
         }
 
-        function loadTrack(index) {
-            if (index < 0 || index >= currentQueue.length) return;
-            
-            currentIndex = index;
-            const track = currentQueue[currentIndex];
-            
-            if (track.url) {
-                audio.src = track.url;
-                audio.load();
-            }
-
+        function updateTrackUI(track) {
             playerTitle.textContent = track.title;
             playerArtist.textContent = track.artist;
             playerCover.src = track.cover;
@@ -768,8 +762,24 @@
             fsCover.src = track.cover;
             lyricsInput.value = track.lyrics || '';
             updateLyricsLines();
-
             renderLibrary();
+        }
+
+        function loadTrack(index) {
+            if (index < 0 || index >= currentQueue.length) return;
+            
+            currentIndex = index;
+            const track = currentQueue[currentIndex];
+            
+            updateTrackUI(track);
+
+            if (!track.url) {
+                alert("El archivo físico de esta canción necesita ser vinculado de nuevo. Por favor, toca el botón 'Cargar Música' y selecciona tus archivos MP3 para activarlos.");
+                return;
+            }
+
+            audio.src = track.url;
+            audio.load();
         }
 
         function togglePlay() {
@@ -777,7 +787,7 @@
                 loadTrack(0);
             }
             if (!audio.src) {
-                alert("Por favor, selecciona un archivo de audio local para reproducir.");
+                alert("Por favor, selecciona tus archivos de audio locales tocando el botón 'Cargar Música'.");
                 return;
             }
 
@@ -795,6 +805,7 @@
                 fsPlayPauseBtn.textContent = 'pause_circle_filled';
             }).catch(e => {
                 console.error("Error reproduciendo:", e);
+                alert("Vuelve a cargar tus archivos locales para autorizar la reproducción.");
             });
         }
 
@@ -813,13 +824,24 @@
         }
 
         function nextTrack() {
-            if (currentIndex < currentQueue.length - 1) {
-                loadTrack(currentIndex + 1);
-                playTrack();
+            if (currentQueue.length === 0) return;
+
+            let nextIndex;
+            if (isShuffle) {
+                // Elegir una canción al azar que no sea la actual
+                nextIndex = Math.floor(Math.random() * currentQueue.length);
+                if (nextIndex === currentIndex && currentQueue.length > 1) {
+                    nextIndex = (currentIndex + 1) % currentQueue.length;
+                }
             } else {
-                loadTrack(0);
-                pauseTrack();
+                nextIndex = currentIndex + 1;
+                if (nextIndex >= currentQueue.length) {
+                    nextIndex = 0; // Bucle al inicio
+                }
             }
+
+            loadTrack(nextIndex);
+            playTrack();
         }
 
         function updateLyricsLines() {
