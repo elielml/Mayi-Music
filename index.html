@@ -10,6 +10,8 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Script oficial de Google para Inicio de Sesión -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root {
             --bg-color: #121212;
@@ -21,380 +23,102 @@
             --player-height: 90px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            padding-bottom: calc(var(--player-height) + 20px);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-primary); padding-bottom: calc(var(--player-height) + 20px); }
 
         header {
-            background-color: var(--surface-color);
-            padding: 15px 20px;
-            border-bottom: 2px solid var(--primary-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background-color: var(--surface-color); padding: 15px 20px; border-bottom: 2px solid var(--primary-color);
+            position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center;
         }
-
-        .header-spacer { width: 40px; } /* Para mantener el título centrado */
-
-        header h1 {
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            font-size: 1.6rem;
-            margin: 0;
-        }
-
-        .app-logo {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
+        .header-spacer { width: 40px; }
+        header h1 { color: var(--primary-color); display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 1.6rem; margin: 0; }
+        .app-logo { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
         .profile-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: color 0.3s, background 0.3s;
+            background: none; border: none; color: var(--text-secondary); cursor: pointer; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: color 0.3s, background 0.3s;
         }
+        .profile-btn:hover { color: var(--primary-color); background: rgba(255,255,255,0.05); }
 
-        .profile-btn:hover {
-            color: var(--primary-color);
-            background: rgba(255,255,255,0.05);
-        }
+        main { max-width: 800px; margin: 20px auto; padding: 0 15px; }
 
-        main {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 0 15px;
-        }
-
-        .main-tabs {
-            display: flex;
-            background-color: var(--surface-color);
-            border-radius: 12px;
-            margin-bottom: 20px;
-            overflow: hidden;
-            border: 1px solid #333;
-        }
-
+        .main-tabs { display: flex; background-color: var(--surface-color); border-radius: 12px; margin-bottom: 20px; overflow: hidden; border: 1px solid #333; }
         .main-tab {
-            flex: 1;
-            padding: 14px 5px;
-            text-align: center;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
+            flex: 1; padding: 14px 5px; text-align: center; background: none; border: none; color: var(--text-secondary);
+            font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 5px;
         }
+        .main-tab.active { background-color: var(--primary-color); color: #000; }
 
-        .main-tab.active {
-            background-color: var(--primary-color);
-            color: #000;
-        }
+        .controls-section { background-color: var(--surface-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .search-bar { display: flex; gap: 10px; }
+        .search-bar input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #333; background-color: #2a2a2a; color: white; outline: none; transition: border-color 0.3s; }
+        .search-bar input:focus { border-color: var(--primary-color); }
 
-        .controls-section {
-            background-color: var(--surface-color);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .search-bar {
-            display: flex;
-            gap: 10px;
-        }
-
-        .search-bar input {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background-color: #2a2a2a;
-            color: white;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .search-bar input:focus {
-            border-color: var(--primary-color);
-        }
-
-        .action-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-        }
-
+        .action-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
         .btn {
-            background-color: var(--primary-color);
-            color: #000;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: background-color 0.3s;
+            background-color: var(--primary-color); color: #000; border: none; padding: 12px 20px; border-radius: 8px;
+            cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: background-color 0.3s;
         }
+        .btn:hover { background-color: var(--primary-variant); color: white; }
+        .btn-secondary { background-color: #333; color: white; }
+        .btn-danger { background-color: #cf6679; color: #000; }
 
-        .btn:hover {
-            background-color: var(--primary-variant);
-            color: white;
-        }
+        .local-file-wrapper { position: relative; overflow: hidden; display: inline-block; }
+        .local-file-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
 
-        .btn-secondary {
-            background-color: #333;
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: #cf6679;
-            color: #000;
-        }
-
-        .local-file-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-
-        .local-file-wrapper input[type=file] {
-            font-size: 100px;
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        ul.playlist {
-            list-style: none;
-        }
-
-        .track-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #333;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            border-radius: 8px;
-        }
-
-        .track-item:hover, .track-item.active {
-            background-color: rgba(187, 134, 252, 0.1);
-        }
-
-        .track-item.active {
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .track-img {
-            width: 50px;
-            height: 50px;
-            border-radius: 4px;
-            margin-right: 15px;
-            background-color: #333;
-            object-fit: cover;
-        }
-
-        .track-info-list {
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .track-title-list {
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .track-artist-list {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .edit-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s;
-        }
+        ul.playlist { list-style: none; }
+        .track-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #333; cursor: pointer; transition: background-color 0.2s; border-radius: 8px; }
+        .track-item:hover, .track-item.active { background-color: rgba(187, 134, 252, 0.1); }
+        .track-item.active { border-left: 4px solid var(--primary-color); }
+        .track-img { width: 50px; height: 50px; border-radius: 4px; margin-right: 15px; background-color: #333; object-fit: cover; }
+        .track-info-list { flex: 1; overflow: hidden; }
+        .track-title-list { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-artist-list { font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .edit-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
 
         /* MODAL DE INICIO DE SESIÓN */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            z-index: 4000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8);
+            z-index: 4000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s;
         }
-        .modal-overlay.open {
-            display: flex;
-            opacity: 1;
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .modal-content { background-color: var(--surface-color); border-radius: 12px; width: 90%; max-width: 400px; padding: 25px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { font-size: 1.3rem; color: var(--primary-color); margin: 0; }
+        .modal-body { display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        
+        .google-login-btn {
+            background-color: white; color: #757575; border: none; padding: 12px 20px; border-radius: 4px;
+            font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,.25); width: 100%; font-family: Roboto, arial, sans-serif;
         }
-        .modal-content {
-            background-color: var(--surface-color);
-            border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
-            padding: 25px;
-            border: 1px solid #333;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .modal-header h2 {
-            font-size: 1.3rem;
-            color: var(--primary-color);
-            margin: 0;
-        }
-        .modal-body {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .modal-body input {
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background-color: #2a2a2a;
-            color: white;
-            outline: none;
-        }
-        .modal-body input:focus { border-color: var(--primary-color); }
-        .forgot-link {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            text-align: center;
-            text-decoration: none;
-            margin-top: 5px;
-        }
-        .forgot-link:hover { color: var(--primary-color); }
+        .google-login-btn img { width: 18px; height: 18px; }
 
         /* REPRODUCTOR DE MÚSICA FIJO INFERIOR */
         .player-bar {
-            position: fixed;
-            bottom: 0; left: 0; width: 100%;
-            height: var(--player-height);
-            background-color: var(--surface-color);
-            border-top: 1px solid #333;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            gap: 15px;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
-            z-index: 1000;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: var(--player-height); background-color: var(--surface-color);
+            border-top: 1px solid #333; display: flex; align-items: center; padding: 0 20px; gap: 15px; box-shadow: 0 -4px 10px rgba(0,0,0,0.5); z-index: 1000;
         }
-
-        .now-playing {
-            display: flex; align-items: center; width: 30%; min-width: 150px; overflow: hidden; cursor: pointer;
-        }
-
-        .now-playing img {
-            width: 60px; height: 60px; border-radius: 6px; margin-right: 15px; object-fit: cover;
-        }
-
+        .now-playing { display: flex; align-items: center; width: 30%; min-width: 150px; overflow: hidden; cursor: pointer; }
+        .now-playing img { width: 60px; height: 60px; border-radius: 6px; margin-right: 15px; object-fit: cover; }
         .now-playing-info { overflow: hidden; }
         .np-title { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .np-artist { font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        .player-controls-container {
-            flex: 1; display: flex; flex-direction: column; align-items: center;
-        }
-
-        .main-controls {
-            display: flex; align-items: center; gap: 15px; margin-bottom: 5px; user-select: none;
-        }
-
-        .main-controls span {
-            cursor: pointer; color: var(--text-secondary); transition: color 0.2s; font-size: 26px; position: relative;
-        }
+        .player-controls-container { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .main-controls { display: flex; align-items: center; gap: 15px; margin-bottom: 5px; user-select: none; }
+        .main-controls span { cursor: pointer; color: var(--text-secondary); transition: color 0.2s; font-size: 26px; position: relative; }
         .main-controls span:hover { color: var(--text-primary); }
         .main-controls span.active-mode { color: var(--primary-color) !important; }
-
         .loop-one-badge {
             position: absolute; top: -4px; right: -6px; font-size: 10px; font-weight: bold; background: var(--primary-color);
             color: #000; border-radius: 50%; width: 14px; height: 14px; display: none; align-items: center; justify-content: center;
         }
-
         .main-controls .play-btn { color: var(--text-primary); font-size: 38px; }
-
-        .progress-container {
-            width: 100%; display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: var(--text-secondary);
-        }
-
-        .progress-bar {
-            flex: 1; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: #555; outline: none; cursor: pointer;
-        }
-        .progress-bar::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--primary-color); cursor: pointer;
-        }
-
-        .volume-container {
-            width: 15%; display: flex; align-items: center; gap: 10px; justify-content: flex-end; color: var(--text-secondary);
-        }
-
-        .volume-bar {
-            width: 80px; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: #555; outline: none; cursor: pointer;
-        }
-        .volume-bar::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--text-primary); cursor: pointer;
-        }
+        .progress-container { width: 100%; display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: var(--text-secondary); }
+        .progress-bar { flex: 1; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: #555; outline: none; cursor: pointer; }
+        .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--primary-color); cursor: pointer; }
+        .volume-container { width: 15%; display: flex; align-items: center; gap: 10px; justify-content: flex-end; color: var(--text-secondary); }
+        .volume-bar { width: 80px; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: #555; outline: none; cursor: pointer; }
+        .volume-bar::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--text-primary); cursor: pointer; }
 
         /* REPRODUCTOR DE VIDEO */
         #video-modal {
@@ -426,7 +150,6 @@
             padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; margin-top: 5px; transition: background 0.2s;
         }
         .add-lyrics-btn:hover { background-color: rgba(187, 134, 252, 0.1); }
-
         .lyrics-box {
             width: 100%; max-width: 500px; background: var(--surface-color); border-radius: 12px; padding: 10px 15px; text-align: center;
             flex: 1; max-height: calc(100vh - 320px); overflow-y: hidden; border: 1px solid #333; display: none; flex-direction: column;
@@ -437,7 +160,6 @@
         .lyrics-scroll textarea { width: 100%; height: 100%; background: transparent; border: none; color: white; resize: none; outline: none; font-size: 1rem; line-height: 1.6; text-align: center; }
         
         .fs-controls { width: 100%; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; padding-top: 5px; }
-
         .status-message { text-align: center; margin: 10px 0; color: var(--text-secondary); font-size: 0.9rem; }
 
         @media (max-width: 768px) {
@@ -445,7 +167,7 @@
             .volume-container { display: none; }
             .now-playing { width: 40%; }
             .fs-cover-large { width: 170px; height: 170px; }
-            .main-tab span { font-size: 20px; } /* iconos más pequeños en móvil */
+            .main-tab span { font-size: 20px; } 
         }
     </style>
 </head>
@@ -481,7 +203,7 @@
         <div id="section-music" class="tab-content">
             <div class="controls-section">
                 <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                    Biblioteca musical permanente.
+                    Biblioteca musical permanente local.
                 </p>
                 <div class="search-bar">
                     <input type="text" id="search-input" placeholder="Buscar música..." oninput="filterLibrary()">
@@ -528,34 +250,33 @@
         <div id="section-online" class="tab-content" style="display: none;">
             <div class="controls-section">
                 <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                    Buscador conectado a tu Google Drive.
+                    Conectado a tu Google Drive para buscar y reproducir audios directamente.
                 </p>
                 <div class="search-bar">
-                    <input type="text" id="search-online-input" placeholder="Nombre de la canción..." onkeypress="if(event.key === 'Enter') searchDriveMusic()">
+                    <input type="text" id="search-online-input" placeholder="Nombre de la canción (Drive)..." onkeypress="if(event.key === 'Enter') searchDriveMusic()">
                     <button class="btn" onclick="searchDriveMusic()"><span class="material-icons">search</span></button>
                 </div>
-                <div class="status-message" id="online-status-message">Conectado. Escribe para buscar en Drive.</div>
+                <div class="status-message" id="online-status-message">Escribe para buscar archivos MP3 o audios.</div>
             </div>
             <ul id="online-playlist" class="playlist"></ul>
         </div>
     </main>
 
-    <!-- MODAL DE INICIO DE SESIÓN -->
+    <!-- MODAL DE INICIO DE SESIÓN CON GOOGLE -->
     <div id="login-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Iniciar sesión</h2>
+                <h2>Conectar Drive</h2>
                 <button class="edit-btn" onclick="closeLoginModal()"><span class="material-icons">close</span></button>
             </div>
             <div class="modal-body">
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px;">
-                    Para buscar música en tu Google Drive, necesitas identificarte.
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
+                    Para acceder a "Música en Línea", la aplicación necesita permiso de solo lectura para buscar y reproducir música desde tu Google Drive.
                 </p>
-                <input type="email" id="login-email" placeholder="Correo electrónico">
-                <input type="password" id="login-password" placeholder="Contraseña">
-                <button class="btn" onclick="handleLogin()" style="justify-content: center;">Ingresar</button>
-                <button class="btn btn-secondary" onclick="handleRegister()" style="justify-content: center;">Registrarse</button>
-                <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                <button class="google-login-btn" onclick="handleGoogleLogin()">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+                    Iniciar sesión con Google
+                </button>
             </div>
         </div>
     </div>
@@ -644,41 +365,142 @@
     </div>
 
     <script>
-        // --- 1. AUTENTICACIÓN Y PESTAÑAS ---
+        // ==========================================
+        // 1. CONFIGURACIÓN DE GOOGLE DRIVE API
+        // ==========================================
+        // PEGA AQUÍ TU CLIENT_ID GENERADO EN GOOGLE CLOUD
+        const CLIENT_ID = 'TU_CLIENT_ID_AQUI'; 
+        
+        let tokenClient;
+        let accessToken = null;
         let isLoggedIn = false;
 
-        function openLoginModal() {
-            document.getElementById('login-modal').classList.add('open');
-        }
+        // Inicializar el cliente de Google Identity Services
+        window.onload = function () {
+            if (typeof google !== 'undefined') {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: CLIENT_ID,
+                    scope: 'https://www.googleapis.com/auth/drive.readonly',
+                    callback: (tokenResponse) => {
+                        if (tokenResponse && tokenResponse.access_token) {
+                            accessToken = tokenResponse.access_token;
+                            isLoggedIn = true;
+                            closeLoginModal();
+                            document.getElementById('profile-btn').style.color = 'var(--primary-color)';
+                            switchMainTab('online');
+                        }
+                    },
+                });
+            }
+        };
 
-        function closeLoginModal() {
-            document.getElementById('login-modal').classList.remove('open');
-        }
+        function openLoginModal() { document.getElementById('login-modal').classList.add('open'); }
+        function closeLoginModal() { document.getElementById('login-modal').classList.remove('open'); }
 
-        function handleLogin() {
-            const email = document.getElementById('login-email').value;
-            if(!navigator.onLine) {
-                alert("No hay conexión a internet para iniciar sesión.");
+        function handleGoogleLogin() {
+            if (!navigator.onLine) {
+                alert("Sin conexión a internet.");
                 return;
             }
-            if(email.includes('@')) {
-                // Simulación de inicio de sesión exitoso. 
-                // Aquí conectarías Firebase Auth: firebase.auth().signInWithEmailAndPassword(...)
-                isLoggedIn = true;
-                closeLoginModal();
-                document.getElementById('profile-btn').style.color = 'var(--primary-color)';
-                switchMainTab('online');
-            } else {
-                alert("Por favor, ingresa un correo válido.");
+            if (CLIENT_ID === 'TU_CLIENT_ID_AQUI') {
+                alert("Debes configurar el CLIENT_ID de Google en el código para iniciar sesión.");
+                return;
+            }
+            // Pide el token de acceso mostrando la ventana de Google
+            tokenClient.requestAccessToken({ prompt: 'consent' });
+        }
+
+        // --- LÓGICA DE MÚSICA EN LÍNEA (GOOGLE DRIVE) ---
+        let onlineLibrary = [];
+        const onlinePlaylistEl = document.getElementById('online-playlist');
+        const onlineStatusMsg = document.getElementById('online-status-message');
+
+        async function searchDriveMusic() {
+            const query = document.getElementById('search-online-input').value.trim();
+            if(!query || !accessToken) return;
+
+            onlineStatusMsg.textContent = "Buscando en tu Google Drive...";
+            onlinePlaylistEl.innerHTML = '';
+
+            // Busca archivos que sean audio y contengan el texto, que no estén en la papelera
+            const q = `mimeType contains 'audio/' and name contains '${query}' and trashed = false`;
+            const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        isLoggedIn = false;
+                        alert("La sesión expiró. Vuelve a iniciar sesión.");
+                        openLoginModal();
+                        return;
+                    }
+                    throw new Error("Error en la búsqueda");
+                }
+
+                const data = await response.json();
+                
+                if (!data.files || data.files.length === 0) {
+                    onlineStatusMsg.textContent = "No se encontraron canciones en Drive.";
+                    return;
+                }
+
+                onlineLibrary = data.files.map(file => {
+                    let title = file.name.replace(/\.[^/.]+$/, "");
+                    return {
+                        id: file.id,
+                        title: title,
+                        artist: "Google Drive",
+                        cover: 'logo.png',
+                        lyrics: '',
+                        isOnline: true,
+                        url: null // Se descarga solo al hacerle clic
+                    };
+                });
+
+                currentQueue = onlineLibrary;
+                onlineStatusMsg.textContent = `${onlineLibrary.length} resultados encontrados.`;
+                renderOnlineLibrary();
+
+            } catch (error) {
+                console.error(error);
+                onlineStatusMsg.textContent = "Error al conectar con Google Drive.";
             }
         }
 
-        function handleRegister() {
-            alert("Esta función requiere la configuración de una base de datos (Ej: Firebase).");
+        function renderOnlineLibrary() {
+            onlinePlaylistEl.innerHTML = '';
+            if (onlineLibrary.length === 0) return;
+
+            onlineLibrary.forEach((track) => {
+                let originalIndex = currentQueue.findIndex(t => t.id === track.id);
+                const li = document.createElement('li');
+                li.className = `track-item ${originalIndex === currentIndex ? 'active' : ''}`;
+                li.onclick = () => {
+                    loadTrack(originalIndex, true);
+                };
+
+                li.innerHTML = `
+                    <div style="width: 50px; height: 50px; border-radius: 4px; margin-right: 15px; background: #333; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-icons" style="color: var(--primary-color);">cloud_download</span>
+                    </div>
+                    <div class="track-info-list">
+                        <div class="track-title-list">${track.title}</div>
+                        <div class="track-artist-list">${track.artist}</div>
+                    </div>
+                `;
+                onlinePlaylistEl.appendChild(li);
+            });
         }
 
+
+        // ==========================================
+        // 2. LÓGICA DE PESTAÑAS Y BASE DE DATOS LOCAL
+        // ==========================================
         function switchMainTab(tab) {
-            // Verificar conexión y permisos para "Música en Línea"
             if (tab === 'online') {
                 if (!navigator.onLine) {
                     alert("Necesitas conexión a internet para acceder a tu Drive.");
@@ -703,7 +525,6 @@
                 musicPlayerBar.style.display = 'flex';
             }
 
-            // Cambiar cola actual dependiendo de la pestaña
             if (tab === 'online') {
                 currentQueue = onlineLibrary;
                 renderOnlineLibrary();
@@ -713,86 +534,15 @@
             }
         }
 
-        // --- 2. LÓGICA DE MÚSICA EN LÍNEA (GOOGLE DRIVE MOCKUP) ---
-        let onlineLibrary = [];
-        const onlinePlaylistEl = document.getElementById('online-playlist');
-        const onlineStatusMsg = document.getElementById('online-status-message');
-
-        function searchDriveMusic() {
-            const query = document.getElementById('search-online-input').value.trim();
-            if(!query) return;
-
-            onlineStatusMsg.textContent = "Buscando en Google Drive...";
-            onlinePlaylistEl.innerHTML = '';
-
-            // MOCKUP: Simulando respuesta de la API de Google Drive
-            // Aquí iría: fetch('https://www.googleapis.com/drive/v3/files?q=name contains ...')
-            setTimeout(() => {
-                onlineLibrary = [
-                    {
-                        id: 'drive_1',
-                        title: query + " (Drive Mix)",
-                        artist: "Google Drive Audio",
-                        url: "https://actions.google.com/sounds/v1/water/rain_on_roof.ogg", // Audio de prueba seguro
-                        cover: 'logo.png',
-                        lyrics: '',
-                        isOnline: true
-                    },
-                    {
-                        id: 'drive_2',
-                        title: "Ejemplo de pista 2",
-                        artist: "Nube",
-                        url: "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg",
-                        cover: 'logo.png',
-                        lyrics: '',
-                        isOnline: true
-                    }
-                ];
-                currentQueue = onlineLibrary;
-                onlineStatusMsg.textContent = `Resultados encontrados para "${query}".`;
-                renderOnlineLibrary();
-            }, 1000);
-        }
-
-        function renderOnlineLibrary() {
-            onlinePlaylistEl.innerHTML = '';
-            if (onlineLibrary.length === 0) return;
-
-            onlineLibrary.forEach((track) => {
-                let originalIndex = currentQueue.findIndex(t => t.id === track.id);
-                const li = document.createElement('li');
-                li.className = `track-item ${originalIndex === currentIndex ? 'active' : ''}`;
-                li.onclick = () => {
-                    loadTrack(originalIndex, true);
-                    playTrack();
-                };
-
-                li.innerHTML = `
-                    <div style="width: 50px; height: 50px; border-radius: 4px; margin-right: 15px; background: #333; display: flex; align-items: center; justify-content: center;">
-                        <span class="material-icons" style="color: var(--primary-color);">cloud_download</span>
-                    </div>
-                    <div class="track-info-list">
-                        <div class="track-title-list">${track.title}</div>
-                        <div class="track-artist-list">${track.artist}</div>
-                    </div>
-                `;
-                onlinePlaylistEl.appendChild(li);
-            });
-        }
-
-
-        // --- 3. BASE DE DATOS (INDEXEDDB) PARA LOCAL ---
-        const dbName = "MayiMusicDB";
-        const dbVersion = 3;
-        let db = null;
+        const dbName = "MayiMusicDB"; const dbVersion = 3; let db = null;
 
         function initDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open(dbName, dbVersion);
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => { db = request.result; resolve(db); };
-                request.onupgradeneeded = (event) => {
-                    const database = event.target.result;
+                const req = indexedDB.open(dbName, dbVersion);
+                req.onerror = () => reject(req.error);
+                req.onsuccess = () => { db = req.result; resolve(db); };
+                req.onupgradeneeded = (e) => {
+                    const database = e.target.result;
                     if (!database.objectStoreNames.contains("music")) database.createObjectStore("music", { keyPath: "id" });
                     if (!database.objectStoreNames.contains("videos")) database.createObjectStore("videos", { keyPath: "id" });
                 };
@@ -801,33 +551,26 @@
 
         function saveFileToDB(storeName, item) {
             return new Promise((resolve, reject) => {
-                if (!db) return reject();
-                const transaction = db.transaction(storeName, "readwrite");
-                const store = transaction.objectStore(storeName);
-                store.put(item).onsuccess = () => resolve();
+                const tx = db.transaction(storeName, "readwrite");
+                tx.objectStore(storeName).put(item).onsuccess = () => resolve();
             });
         }
-
         function getAllFilesFromDB(storeName) {
-            return new Promise((resolve, reject) => {
-                if (!db) return reject();
-                const transaction = db.transaction(storeName, "readonly");
-                const store = transaction.objectStore(storeName);
-                const request = store.getAll();
-                request.onsuccess = () => resolve(request.result);
+            return new Promise((resolve) => {
+                const tx = db.transaction(storeName, "readonly");
+                tx.objectStore(storeName).getAll().onsuccess = (e) => resolve(e.target.result);
             });
         }
-
         function clearDBStore(storeName) {
-            return new Promise((resolve, reject) => {
-                if (!db) return reject();
-                const transaction = db.transaction(storeName, "readwrite");
-                const store = transaction.objectStore(storeName);
-                store.clear().onsuccess = () => resolve();
+            return new Promise((resolve) => {
+                const tx = db.transaction(storeName, "readwrite");
+                tx.objectStore(storeName).clear().onsuccess = () => resolve();
             });
         }
 
-        // --- 4. VARIABLES GLOBALES DE REPRODUCCIÓN ---
+        // ==========================================
+        // 3. VARIABLES Y REPRODUCTORES GENERALES
+        // ==========================================
         const audio = new Audio();
         let library = [];      
         let currentQueue = []; 
@@ -836,8 +579,8 @@
         let isShuffle = false;
         let loopMode = 0; 
         let lyricLines = [];
-        let videoLibrary = [];
 
+        let videoLibrary = [];
         const videoPlaylistEl = document.getElementById('video-playlist');
         const videoModal = document.getElementById('video-modal');
         const mainVideoPlayer = document.getElementById('main-video-player');
@@ -872,41 +615,31 @@
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 await initDB();
-                
                 const savedMusic = await getAllFilesFromDB("music");
                 if (savedMusic && savedMusic.length > 0) {
-                    library = savedMusic.map(item => ({
-                        ...item, url: URL.createObjectURL(item.blob), isOnline: false
-                    }));
+                    library = savedMusic.map(item => ({ ...item, url: URL.createObjectURL(item.blob), isOnline: false }));
                     currentQueue = [...library];
                     statusMsg.textContent = `${library.length} canciones cargadas.`;
                     renderLibrary();
-                    if (library.length > 0) { currentIndex = 0; updateTrackUI(library[0]); }
-                } else {
-                    statusMsg.textContent = "Biblioteca musical vacía.";
-                }
+                } else { statusMsg.textContent = "Biblioteca musical vacía."; }
 
                 const savedVideos = await getAllFilesFromDB("videos");
                 if (savedVideos && savedVideos.length > 0) {
-                    videoLibrary = savedVideos.map(item => ({
-                        ...item, url: URL.createObjectURL(item.blob)
-                    }));
+                    videoLibrary = savedVideos.map(item => ({ ...item, url: URL.createObjectURL(item.blob) }));
                     videoStatusMsg.textContent = `${videoLibrary.length} videos cargados.`;
                     renderVideoLibrary();
-                } else {
-                    videoStatusMsg.textContent = "Biblioteca de videos vacía.";
-                }
-
+                } else { videoStatusMsg.textContent = "Biblioteca de videos vacía."; }
             } catch(e) { console.error(e); }
         });
 
-        // --- 5. FUNCIONES LOCALES (MÚSICA Y VIDEO) ---
+        // ==========================================
+        // 4. FUNCIONES LOCALES (MÚSICA Y VIDEO)
+        // ==========================================
         async function clearLibrary() {
             if (confirm("¿Borrar toda la música guardada?")) {
                 await clearDBStore("music");
                 library = []; currentQueue = []; currentIndex = -1;
-                audio.pause(); audio.src = "";
-                renderLibrary();
+                audio.pause(); audio.src = ""; renderLibrary();
                 playerTitle.textContent = "Sin pista"; playerArtist.textContent = "Desconocido";
                 statusMsg.textContent = "Biblioteca musical vaciada.";
             }
@@ -916,24 +649,16 @@
             if (confirm("¿Borrar todos los videos guardados?")) {
                 await clearDBStore("videos");
                 videoLibrary = []; mainVideoPlayer.pause(); mainVideoPlayer.src = "";
-                renderVideoLibrary();
-                videoStatusMsg.textContent = "Biblioteca de videos vaciada.";
+                renderVideoLibrary(); videoStatusMsg.textContent = "Biblioteca de videos vaciada.";
             }
         }
 
         async function loadLocalVideos(event) {
-            const files = event.target.files;
-            if (files.length === 0) return;
+            const files = event.target.files; if (files.length === 0) return;
             videoStatusMsg.textContent = "Guardando videos...";
             for (let file of files) {
-                let rawName = file.name.replace(/\.[^/.]+$/, ""); 
-                let artist = "Video Musical";
-                let title = rawName;
-                if (rawName.includes("-")) {
-                    let parts = rawName.split("-");
-                    artist = cleanArtistName(parts[0].trim());
-                    title = parts.slice(1).join("-").trim();
-                }
+                let rawName = file.name.replace(/\.[^/.]+$/, ""); let artist = "Video Musical"; let title = rawName;
+                if (rawName.includes("-")) { let parts = rawName.split("-"); artist = cleanArtistName(parts[0].trim()); title = parts.slice(1).join("-").trim(); }
                 const videoItem = { id: Date.now() + Math.random(), title: title, artist: artist, blob: file };
                 await saveFileToDB("videos", videoItem);
                 videoLibrary.push({ ...videoItem, url: URL.createObjectURL(file) });
@@ -944,10 +669,9 @@
 
         async function editVideoTitle(event, id) {
             event.stopPropagation();
-            let video = videoLibrary.find(v => v.id === id);
-            if (!video) return;
+            let video = videoLibrary.find(v => v.id === id); if (!video) return;
             let newTitle = prompt("Escribe el nombre correcto para este video:", video.title);
-            if (newTitle !== null && newTitle.trim() !== "") {
+            if (newTitle && newTitle.trim() !== "") {
                 video.title = newTitle.trim();
                 await saveFileToDB("videos", { id: video.id, title: video.title, artist: video.artist, blob: video.blob });
                 renderVideoLibrary();
@@ -956,14 +680,9 @@
 
         function renderVideoLibrary() {
             videoPlaylistEl.innerHTML = '';
-            if (videoLibrary.length === 0) {
-                videoPlaylistEl.innerHTML = '<li style="text-align:center; color: var(--text-secondary); padding: 20px;">No hay videos cargados.</li>';
-                return;
-            }
+            if (videoLibrary.length === 0) { videoPlaylistEl.innerHTML = '<li style="text-align:center; color: var(--text-secondary); padding: 20px;">No hay videos cargados.</li>'; return; }
             videoLibrary.forEach((video, index) => {
-                const li = document.createElement('li');
-                li.className = 'track-item';
-                li.onclick = () => playVideo(index);
+                const li = document.createElement('li'); li.className = 'track-item'; li.onclick = () => playVideo(index);
                 li.innerHTML = `
                     <div style="width: 50px; height: 50px; border-radius: 4px; margin-right: 15px; background: #333; display: flex; align-items: center; justify-content: center;">
                         <span class="material-icons" style="color: var(--primary-color);">play_arrow</span>
@@ -978,31 +697,17 @@
         function playVideo(index) {
             const video = videoLibrary[index];
             if (!audio.paused) pauseTrack();
-            mainVideoPlayer.src = video.url;
-            videoModalTitle.textContent = video.title;
-            videoModal.classList.add('open');
-            mainVideoPlayer.play();
+            mainVideoPlayer.src = video.url; videoModalTitle.textContent = video.title;
+            videoModal.classList.add('open'); mainVideoPlayer.play();
         }
-
-        function closeVideoModal() {
-            mainVideoPlayer.pause();
-            mainVideoPlayer.src = "";
-            videoModal.classList.remove('open');
-        }
+        function closeVideoModal() { mainVideoPlayer.pause(); mainVideoPlayer.src = ""; videoModal.classList.remove('open'); }
 
         async function loadLocalFiles(event) {
-            const files = event.target.files;
-            if (files.length === 0) return;
+            const files = event.target.files; if (files.length === 0) return;
             statusMsg.textContent = "Guardando canciones...";
             for (let file of files) {
-                let rawName = file.name.replace(/\.[^/.]+$/, ""); 
-                let artist = "Desconocido";
-                let title = rawName;
-                if (rawName.includes("-")) {
-                    let parts = rawName.split("-");
-                    artist = cleanArtistName(parts[0].trim());
-                    title = parts.slice(1).join("-").trim();
-                }
+                let rawName = file.name.replace(/\.[^/.]+$/, ""); let artist = "Desconocido"; let title = rawName;
+                if (rawName.includes("-")) { let parts = rawName.split("-"); artist = cleanArtistName(parts[0].trim()); title = parts.slice(1).join("-").trim(); }
                 const trackItem = { id: Date.now() + Math.random(), title: title, artist: artist, cover: 'logo.png', lyrics: '', blob: file };
                 await saveFileToDB("music", trackItem);
                 library.push({ ...trackItem, url: URL.createObjectURL(file), isOnline: false });
@@ -1013,21 +718,14 @@
             if (currentIndex === -1 && library.length > 0) loadTrack(0);
         }
 
-        function cleanArtistName(name) {
-            let clean = name.replace(/_/g, " ").trim();
-            return clean.charAt(0).toUpperCase() + clean.slice(1);
-        }
+        function cleanArtistName(name) { return name.replace(/_/g, " ").trim().charAt(0).toUpperCase() + name.replace(/_/g, " ").trim().slice(1); }
 
         function renderLibrary() {
             playlistEl.innerHTML = '';
-            if (library.length === 0) {
-                playlistEl.innerHTML = '<li style="text-align:center; color: var(--text-secondary); padding: 20px;">No hay canciones.</li>';
-                return;
-            }
+            if (library.length === 0) { playlistEl.innerHTML = '<li style="text-align:center; color: var(--text-secondary); padding: 20px;">No hay canciones.</li>'; return; }
             library.forEach((track) => {
                 let originalIndex = currentQueue.findIndex(t => t.id === track.id);
-                const li = document.createElement('li');
-                li.className = `track-item ${originalIndex === currentIndex ? 'active' : ''}`;
+                const li = document.createElement('li'); li.className = `track-item ${originalIndex === currentIndex && !track.isOnline ? 'active' : ''}`;
                 li.onclick = () => { loadTrack(originalIndex); playTrack(); };
                 li.innerHTML = `
                     <img src="${track.cover}" class="track-img" alt="Portada" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
@@ -1043,21 +741,20 @@
             renderLibrary();
         }
 
-        // --- 6. CONTROLES DE REPRODUCCIÓN GENERALES ---
+        // ==========================================
+        // 5. CONTROLES GENERALES DE REPRODUCCIÓN
+        // ==========================================
         function toggleShuffle() {
             isShuffle = !isShuffle;
-            const btn1 = document.getElementById('shuffle-btn-1');
-            const btn2 = document.getElementById('shuffle-btn-2');
+            const btn1 = document.getElementById('shuffle-btn-1'); const btn2 = document.getElementById('shuffle-btn-2');
             if (isShuffle) { btn1.classList.add('active-mode'); btn2.classList.add('active-mode'); } 
             else { btn1.classList.remove('active-mode'); btn2.classList.remove('active-mode'); }
         }
 
         function toggleLoop() {
             loopMode = (loopMode + 1) % 3; 
-            const btn1 = document.getElementById('loop-btn-1');
-            const btn2 = document.getElementById('loop-btn-2');
-            const badge1 = document.getElementById('loop-badge-1');
-            const badge2 = document.getElementById('loop-badge-2');
+            const btn1 = document.getElementById('loop-btn-1'); const btn2 = document.getElementById('loop-btn-2');
+            const badge1 = document.getElementById('loop-badge-1'); const badge2 = document.getElementById('loop-badge-2');
             if (loopMode === 0) {
                 btn1.classList.remove('active-mode'); btn2.classList.remove('active-mode');
                 badge1.style.display = 'none'; badge2.style.display = 'none';
@@ -1071,55 +768,62 @@
         }
 
         function updateTrackUI(track) {
-            playerTitle.textContent = track.title;
-            playerArtist.textContent = track.artist;
-            playerCover.src = track.cover;
-            fsTitle.textContent = track.title;
-            fsArtist.textContent = track.artist;
-            fsCover.src = track.cover;
+            playerTitle.textContent = track.title; playerArtist.textContent = track.artist; playerCover.src = track.cover;
+            fsTitle.textContent = track.title; fsArtist.textContent = track.artist; fsCover.src = track.cover;
             
-            lyricsInput.value = track.lyrics || '';
-            updateLyricsLines();
+            lyricsInput.value = track.lyrics || ''; updateLyricsLines();
 
             if (track.lyrics && track.lyrics.trim() !== '') {
-                fsCover.className = 'fs-cover-small';
-                lyricsBoxContainer.classList.add('active');
-                addLyricsTrigger.style.display = 'none';
+                fsCover.className = 'fs-cover-small'; lyricsBoxContainer.classList.add('active'); addLyricsTrigger.style.display = 'none';
             } else {
-                fsCover.className = 'fs-cover-large';
-                lyricsBoxContainer.classList.remove('active');
-                // Ocultar botón de agregar letra si es online, drive no lo guardará
+                fsCover.className = 'fs-cover-large'; lyricsBoxContainer.classList.remove('active');
                 addLyricsTrigger.style.display = track.isOnline ? 'none' : 'flex';
             }
-            
-            // Actualizar clase activa en la lista correspondiente
             if(track.isOnline) { renderOnlineLibrary(); } else { renderLibrary(); }
         }
 
-        function enableLyricsInput() {
-            addLyricsTrigger.style.display = 'none';
-            fsCover.className = 'fs-cover-small';
-            lyricsBoxContainer.classList.add('active');
-        }
+        function enableLyricsInput() { addLyricsTrigger.style.display = 'none'; fsCover.className = 'fs-cover-small'; lyricsBoxContainer.classList.add('active'); }
 
-        function loadTrack(index, isOnline = false) {
+        async function loadTrack(index, isOnlinePlay = false) {
             if (index < 0 || index >= currentQueue.length) return;
             currentIndex = index;
             const track = currentQueue[currentIndex];
             
-            if (isOnline && !navigator.onLine) {
-                alert("Conexión perdida. No se puede reproducir la pista en línea.");
-                return;
+            updateTrackUI(track);
+
+            // Manejo de reproducción de Google Drive
+            if (isOnlinePlay || track.isOnline) {
+                if (!navigator.onLine) { alert("Sin conexión."); return; }
+                
+                // Si aún no hemos descargado el enlace del audio
+                if (!track.url) {
+                    playerTitle.textContent = "Descargando...";
+                    try {
+                        const res = await fetch(`https://www.googleapis.com/drive/v3/files/${track.id}?alt=media`, {
+                            headers: { 'Authorization': `Bearer ${accessToken}` }
+                        });
+                        if (!res.ok) throw new Error("No autorizado o no disponible");
+                        const blob = await res.blob();
+                        track.url = URL.createObjectURL(blob);
+                        playerTitle.textContent = track.title; // Restaurar título
+                    } catch(e) {
+                        alert("Error al descargar el archivo desde Google Drive.");
+                        playerTitle.textContent = track.title;
+                        return;
+                    }
+                }
             }
 
-            updateTrackUI(track);
+            if (!track.url) { alert("Error cargando el archivo."); return; }
+
             audio.src = track.url;
             audio.load();
+            playTrack();
         }
 
         function togglePlay() {
-            if (currentIndex === -1 && currentQueue.length > 0) { loadTrack(0); }
-            if (!audio.src) { alert("Selecciona una pista para reproducir."); return; }
+            if (currentIndex === -1 && currentQueue.length > 0) { loadTrack(0); return; }
+            if (!audio.src) return;
             if (audio.paused) { playTrack(); } else { pauseTrack(); }
         }
 
@@ -1136,9 +840,7 @@
             playPauseBtn.textContent = 'play_circle_filled'; fsPlayPauseBtn.textContent = 'play_circle_filled';
         }
 
-        function prevTrack() {
-            if (currentIndex > 0) { loadTrack(currentIndex - 1); playTrack(); }
-        }
+        function prevTrack() { if (currentIndex > 0) loadTrack(currentIndex - 1); }
 
         function nextTrack() {
             if (currentQueue.length === 0) return;
@@ -1154,21 +856,17 @@
                     if (loopMode === 1) { nextIndex = 0; } else { pauseTrack(); return; }
                 }
             }
-            loadTrack(nextIndex); playTrack();
+            loadTrack(nextIndex, currentQueue[nextIndex].isOnline);
         }
 
-        function updateLyricsLines() {
-            let text = lyricsInput.value;
-            lyricLines = text.split('\n').filter(line => line.trim() !== '');
-        }
+        function updateLyricsLines() { let text = lyricsInput.value; lyricLines = text.split('\n').filter(line => line.trim() !== ''); }
 
         audio.addEventListener('timeupdate', () => {
             if (isNaN(audio.duration)) return;
             seekBar.max = audio.duration; seekBar.value = audio.currentTime;
             fsSeekBar.max = audio.duration; fsSeekBar.value = audio.currentTime;
             
-            let formattedCur = formatTime(audio.currentTime);
-            let formattedTot = formatTime(audio.duration);
+            let formattedCur = formatTime(audio.currentTime); let formattedTot = formatTime(audio.duration);
             timeCurrent.textContent = formattedCur; timeTotal.textContent = formattedTot;
             fsTimeCurrent.textContent = formattedCur; fsTimeTotal.textContent = formattedTot;
 
@@ -1181,32 +879,17 @@
         });
 
         audio.addEventListener('ended', nextTrack);
-
-        function seekTrack() {
-            audio.currentTime = seekBar.value; fsSeekBar.value = seekBar.value;
-            if (!isPlaying) playTrack();
-        }
-
         function updateSeekTime() { timeCurrent.textContent = formatTime(seekBar.value); }
-
-        function formatTime(seconds) {
-            let min = Math.floor(seconds / 60);
-            let sec = Math.floor(seconds % 60);
-            return `${min}:${sec < 10 ? '0'+sec : sec}`;
-        }
-
+        function seekTrack() { audio.currentTime = seekBar.value; fsSeekBar.value = seekBar.value; if (!isPlaying) playTrack(); }
+        function formatTime(seconds) { let min = Math.floor(seconds / 60); let sec = Math.floor(seconds % 60); return `${min}:${sec < 10 ? '0'+sec : sec}`; }
         function changeVolume() { audio.volume = volumeBar.value; }
 
         async function saveLyrics() {
             if (currentIndex === -1) return;
             let currentTrack = currentQueue[currentIndex];
-            if (currentTrack.isOnline) {
-                alert("Las letras de pistas en línea no se guardan localmente.");
-                return;
-            }
+            if (currentTrack.isOnline) { alert("Las letras de pistas en línea no se guardan localmente."); return; }
             
-            let text = lyricsInput.value;
-            currentTrack.lyrics = text;
+            let text = lyricsInput.value; currentTrack.lyrics = text;
             let libItem = library.find(t => t.id === currentTrack.id);
             if (libItem) libItem.lyrics = text;
 
