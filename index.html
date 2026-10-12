@@ -143,31 +143,7 @@
             cursor: pointer;
         }
 
-        /* TABS Y SECCIONES */
-        .tabs {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            padding-bottom: 5px;
-        }
-
-        .tab-btn.active {
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
-        }
-
-        #playlist, #artists-container {
+        #playlist {
             list-style: none;
         }
 
@@ -216,21 +192,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        .artist-group {
-            margin-bottom: 20px;
-            background: var(--surface-color);
-            border-radius: 10px;
-            padding: 15px;
-        }
-
-        .artist-name-header {
-            font-size: 1.2rem;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 5px;
         }
 
         /* REPRODUCTOR FIJO INFERIOR */
@@ -309,7 +270,7 @@
             font-size: 32px;
         }
 
-        .main-controls span:hover, .main-controls span.active-mode {
+        .main-controls span:hover {
             color: var(--primary-color);
         }
 
@@ -417,26 +378,26 @@
             flex: 1;
             justify-content: center;
             text-align: center;
-            gap: 20px;
+            gap: 15px;
             overflow-y: auto;
             padding: 10px 0;
         }
 
         .fs-cover {
-            width: 240px;
-            height: 240px;
+            width: 200px;
+            height: 200px;
             border-radius: 16px;
             object-fit: cover;
             box-shadow: 0 10px 30px rgba(187, 132, 252, 0.3);
         }
 
         .fs-title {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 600;
         }
 
         .fs-artist {
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
         }
 
@@ -445,22 +406,45 @@
             max-width: 500px;
             background: var(--surface-color);
             border-radius: 12px;
-            padding: 15px;
-            text-align: left;
-            max-height: 150px;
-            overflow-y: auto;
+            padding: 12px;
+            text-align: center;
+            height: 130px;
+            overflow-y: hidden;
             border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
         }
 
-        .lyrics-box textarea {
+        .lyrics-header {
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .lyrics-scroll {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            padding: 10px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            white-space: pre-line;
+        }
+
+        .lyrics-scroll textarea {
             width: 100%;
-            height: 100px;
+            height: 100%;
             background: transparent;
             border: none;
             color: white;
             resize: none;
             outline: none;
             font-size: 0.9rem;
+            text-align: center;
         }
 
         .fs-controls {
@@ -491,8 +475,8 @@
                 width: 45%;
             }
             .fs-cover {
-                width: 200px;
-                height: 200px;
+                width: 160px;
+                height: 160px;
             }
         }
     </style>
@@ -510,7 +494,7 @@
     <main>
         <div class="controls-section">
             <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                Tu biblioteca local. Carga tus canciones y organízalas por canciones o artistas.
+                Biblioteca local. Tu música se guarda automáticamente en este navegador.
             </p>
             
             <div class="search-bar">
@@ -529,24 +513,10 @@
                 </button>
             </div>
             
-            <div id="status-message">Biblioteca vacía. Carga canciones para empezar.</div>
+            <div id="status-message">Cargando biblioteca...</div>
         </div>
 
-        <!-- SECCIONES / PESTAÑAS -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('songs')">Canciones</button>
-            <button class="tab-btn" onclick="switchTab('artists')">Artistas</button>
-        </div>
-
-        <!-- VISTA DE CANCIONES -->
-        <div id="view-songs">
-            <ul id="playlist"></ul>
-        </div>
-
-        <!-- VISTA DE ARTISTAS -->
-        <div id="view-artists" style="display: none;">
-            <div id="artists-container"></div>
-        </div>
+        <ul id="playlist"></ul>
     </main>
 
     <!-- REPRODUCTOR FIJO INFERIOR -->
@@ -578,7 +548,7 @@
         </div>
     </div>
 
-    <!-- PANTALLA COMPLETA / MODAL CON LETRAS -->
+    <!-- PANTALLA COMPLETA / MODAL CON LETRAS SINCRONIZADAS -->
     <div id="fullscreen-player">
         <div class="fs-header">
             <span class="material-icons" onclick="closeFullscreenPlayer()">expand_more</span>
@@ -591,11 +561,13 @@
             <div class="fs-artist" id="fs-artist">Desconocido</div>
             
             <div class="lyrics-box">
-                <div style="font-size: 0.75rem; color: var(--primary-color); margin-bottom: 5px; display:flex; justify-content:space-between;">
-                    <span>LETRAS (Pega aquí la letra desde Google)</span>
-                    <span style="cursor:pointer;" onclick="saveLyrics()">Guardar</span>
+                <div class="lyrics-header">
+                    <span>Letra</span>
+                    <span style="cursor:pointer; font-weight:600;" onclick="saveLyrics()">Guardar</span>
                 </div>
-                <textarea id="lyrics-input" placeholder="Pega la letra de la canción aquí..."></textarea>
+                <div class="lyrics-scroll">
+                    <textarea id="lyrics-input" placeholder="Pega la letra de la canción aquí..." oninput="updateLyricsLines()"></textarea>
+                </div>
             </div>
         </div>
         <div class="fs-controls">
@@ -614,18 +586,17 @@
 
     <script>
         const audio = new Audio();
-        let library = [];      // Lista completa original
-        let currentQueue = []; // Lista actual reproduciéndose (puede estar ordenada o en aleatorio)
+        let library = [];      
+        let currentQueue = []; 
         let currentIndex = -1;
         let isPlaying = false;
         let isShuffle = false;
+        let lyricLines = [];
 
         const playlistEl = document.getElementById('playlist');
-        const artistsContainer = document.getElementById('artists-container');
         const searchInput = document.getElementById('search-input');
         const statusMsg = document.getElementById('status-message');
         
-        // Controles Reproductor inferior
         const playerCover = document.getElementById('player-cover');
         const playerTitle = document.getElementById('player-title');
         const playerArtist = document.getElementById('player-artist');
@@ -635,7 +606,6 @@
         const timeTotal = document.getElementById('time-total');
         const volumeBar = document.getElementById('volume-bar');
 
-        // Controles Pantalla Completa
         const fsPlayer = document.getElementById('fullscreen-player');
         const fsCover = document.getElementById('fs-cover');
         const fsTitle = document.getElementById('fs-title');
@@ -646,6 +616,38 @@
         const fsTimeTotal = document.getElementById('fs-time-total');
         const lyricsInput = document.getElementById('lyrics-input');
 
+        // --- CARGAR BIBLIOTECA DESDE LOCALSTORAGE AL INICIAR ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLibrary = localStorage.getItem('mayi_music_library');
+            if (savedLibrary) {
+                try {
+                    library = JSON.parse(savedLibrary);
+                    currentQueue = [...library];
+                    statusMsg.textContent = `${library.length} canciones guardadas en tu biblioteca.`;
+                    renderLibrary();
+                    if (library.length > 0) {
+                        loadTrack(0);
+                    }
+                } catch(e) {
+                    console.error("Error al cargar biblioteca guardada", e);
+                }
+            } else {
+                statusMsg.textContent = "Biblioteca vacía. Carga tu música.";
+            }
+        });
+
+        function saveLibraryToLocalStorage() {
+            // Guardamos metadatos y letras (las URLs de objetos blob se regeneran al recargar archivos locales)
+            const dataToSave = library.map(t => ({
+                id: t.id,
+                title: t.title,
+                artist: t.artist,
+                lyrics: t.lyrics,
+                cover: t.cover
+            }));
+            localStorage.setItem('mayi_music_library', JSON.stringify(dataToSave));
+        }
+
         // --- GESTIÓN DE ARCHIVOS LOCALES ---
         function loadLocalFiles(event) {
             const files = event.target.files;
@@ -653,9 +655,7 @@
 
             for (let file of files) {
                 const url = URL.createObjectURL(file);
-                let rawName = file.name.replace(/\.[^/.]+$/, ""); // Quitar extensión
-                
-                // Intentar limpiar y separar Artista - Título si el archivo viene como "Artista - Cancion"
+                let rawName = file.name.replace(/\.[^/.]+$/, ""); 
                 let artist = "Desconocido";
                 let title = rawName;
 
@@ -663,23 +663,24 @@
                     let parts = rawName.split("-");
                     artist = cleanArtistName(parts[0].trim());
                     title = parts.slice(1).join("-").trim();
-                } else {
-                    artist = detectArtistFromFilename(rawName);
                 }
 
-                library.push({
-                    id: Date.now() + Math.random(),
-                    title: title,
-                    artist: artist,
-                    rawName: rawName,
-                    url: url,
-                    cover: 'logo.png',
-                    lyrics: '' // Espacio para letras
-                });
+                // Evitar duplicados exactos
+                if (!library.some(t => t.title === title && t.artist === artist)) {
+                    library.push({
+                        id: Date.now() + Math.random(),
+                        title: title,
+                        artist: artist,
+                        url: url,
+                        cover: 'logo.png',
+                        lyrics: '' 
+                    });
+                }
             }
 
             currentQueue = [...library];
             statusMsg.textContent = `${library.length} canciones en tu biblioteca.`;
+            saveLibraryToLocalStorage();
             renderLibrary();
 
             if (currentIndex === -1 && library.length > 0) {
@@ -687,55 +688,19 @@
             }
         }
 
-        // --- LIMPIEZA Y AGRUPACIÓN DE ARTISTAS INTELIGENTE ---
         function cleanArtistName(name) {
             let clean = name.replace(/_/g, " ").trim();
-            // Normalizar mayúsculas de conectores comunes ej: "wisin y yandel" -> "Wisin y Yandel"
-            let lower = clean.toLowerCase();
-            if (lower.includes("wisin") && lower.includes("yandel")) return "Wisin y Yandel";
-            if (lower.includes("yandel") && !lower.includes("wisin")) return "Yandel";
-            if (lower.includes("wisin") && !lower.includes("yandel")) return "Wisin";
-            
-            // Devolver con la primera letra en mayúscula
             return clean.charAt(0).toUpperCase() + clean.slice(1);
         }
 
-        function detectArtistFromFilename(name) {
-            let lower = name.toLowerCase();
-            if (lower.includes("wisin") && lower.includes("yandel")) return "Wisin y Yandel";
-            return "Biblioteca Local";
-        }
-
-        // --- CAMBIAR DE PESTAÑA ---
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            if (tab === 'songs') {
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-                document.getElementById('view-songs').style.display = 'block';
-                document.getElementById('view-artists').style.display = 'none';
-                renderSongsList(currentQueue);
-            } else {
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                document.getElementById('view-songs').style.display = 'none';
-                document.getElementById('view-artists').style.display = 'block';
-                renderArtistsView();
-            }
-        }
-
-        // --- RENDERIZAR BIBLIOTECA ---
         function renderLibrary() {
-            renderSongsList(currentQueue);
-            renderArtistsView();
-        }
-
-        function renderSongsList(songs) {
             playlistEl.innerHTML = '';
-            if (songs.length === 0) {
-                playlistEl.innerHTML = '<li style="text-align:center; color: var(--text-secondary); padding: 20px;">No se encontraron canciones.</li>';
+            if (currentQueue.length === 0) {
+                playlistEl.innerHTML = '<li style="text-align:center; color: var(--text-secondary); padding: 20px;">No hay canciones en la biblioteca.</li>';
                 return;
             }
 
-            songs.forEach((track) => {
+            currentQueue.forEach((track) => {
                 let originalIndex = currentQueue.findIndex(t => t.id === track.id);
                 const li = document.createElement('li');
                 li.className = `track-item ${originalIndex === currentIndex ? 'active' : ''}`;
@@ -755,48 +720,6 @@
             });
         }
 
-        function renderArtistsView() {
-            artistsContainer.innerHTML = '';
-            
-            // Agrupar por artista
-            let groups = {};
-            currentQueue.forEach(track => {
-                let art = track.artist || "Desconocido";
-                if (!groups[art]) groups[art] = [];
-                groups[art].push(track);
-            });
-
-            let artistKeys = Object.keys(groups);
-            if (artistKeys.length === 0) {
-                artistsContainer.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">No hay artistas para mostrar.</p>';
-                return;
-            }
-
-            artistKeys.forEach(artist => {
-                const groupDiv = document.createElement('div');
-                groupDiv.className = 'artist-group';
-                
-                let html = `<div class="artist-name-header">${artist} (${groups[artist].length} canciones)</div>`;
-                
-                groups[artist].forEach(track => {
-                    let originalIndex = currentQueue.findIndex(t => t.id === track.id);
-                    html += `
-                        <div class="track-item" onclick="loadTrack(${originalIndex}); playTrack();">
-                            <img src="${track.cover}" class="track-img" alt="Portada">
-                            <div class="track-info-list">
-                                <div class="track-title-list">${track.title}</div>
-                                <div class="track-artist-list">${track.artist}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                groupDiv.innerHTML = html;
-                artistsContainer.appendChild(groupDiv);
-            });
-        }
-
-        // --- BUSCADOR EN VIVO ---
         function filterLibrary() {
             const query = searchInput.value.toLowerCase().trim();
             currentQueue = library.filter(track => 
@@ -806,14 +729,12 @@
             renderLibrary();
         }
 
-        // --- BOTÓN ALEATORIO (SHUFFLE) ---
         function toggleShuffle() {
             isShuffle = !isShuffle;
             const btnIcon = document.getElementById('shuffle-icon');
             if (isShuffle) {
                 btnIcon.parentElement.style.backgroundColor = 'var(--primary-color)';
                 btnIcon.parentElement.style.color = '#000';
-                // Crear copia mezclada
                 currentQueue = [...library].sort(() => Math.random() - 0.5);
             } else {
                 btnIcon.parentElement.style.backgroundColor = '#333';
@@ -823,17 +744,17 @@
             renderLibrary();
         }
 
-        // --- REPRODUCTOR Y CARGA DE PISTA ---
         function loadTrack(index) {
             if (index < 0 || index >= currentQueue.length) return;
             
             currentIndex = index;
             const track = currentQueue[currentIndex];
             
-            audio.src = track.url;
-            audio.load();
+            if (track.url) {
+                audio.src = track.url;
+                audio.load();
+            }
 
-            // Actualizar interfaz inferior y pantalla completa
             playerTitle.textContent = track.title;
             playerArtist.textContent = track.artist;
             playerCover.src = track.cover;
@@ -842,6 +763,7 @@
             fsArtist.textContent = track.artist;
             fsCover.src = track.cover;
             lyricsInput.value = track.lyrics || '';
+            updateLyricsLines();
 
             renderLibrary();
         }
@@ -850,7 +772,10 @@
             if (currentIndex === -1 && currentQueue.length > 0) {
                 loadTrack(0);
             }
-            if (!audio.src) return;
+            if (!audio.src) {
+                alert("Por favor, selecciona un archivo de audio local para reproducir.");
+                return;
+            }
 
             if (audio.paused) {
                 playTrack();
@@ -893,7 +818,12 @@
             }
         }
 
-        // --- TIEMPO Y PROGRESO ---
+        // --- SINCRONIZACIÓN DE LETRAS AUTOMÁTICA ---
+        function updateLyricsLines() {
+            let text = lyricsInput.value;
+            lyricLines = text.split('\n').filter(line => line.trim() !== '');
+        }
+
         audio.addEventListener('timeupdate', () => {
             if (isNaN(audio.duration)) return;
             
@@ -909,6 +839,17 @@
             timeTotal.textContent = formattedTot;
             fsTimeCurrent.textContent = formattedCur;
             fsTimeTotal.textContent = formattedTot;
+
+            // Subir la letra progresivamente acorde al tiempo de la canción
+            if (lyricLines.length > 0 && audio.duration > 0) {
+                let progressRatio = audio.currentTime / audio.duration;
+                let targetIndex = Math.floor(progressRatio * lyricLines.length);
+                if (targetIndex >= lyricLines.length) targetIndex = lyricLines.length - 1;
+                
+                // Desplazar el textarea automáticamente hacia la línea correspondiente
+                let lineHeight = 22; // altura estimada de cada línea en píxeles
+                lyricsInput.scrollTop = targetIndex * lineHeight;
+            }
         });
 
         audio.addEventListener('ended', nextTrack);
@@ -934,20 +875,18 @@
             audio.volume = volumeBar.value;
         }
 
-        // --- GUARDAR LETRAS ---
         function saveLyrics() {
             if (currentIndex === -1) return;
             let currentTrackId = currentQueue[currentIndex].id;
             
-            // Guardar en la cola actual y en la biblioteca general
             currentQueue[currentIndex].lyrics = lyricsInput.value;
             let libItem = library.find(t => t.id === currentTrackId);
             if (libItem) libItem.lyrics = lyricsInput.value;
 
-            alert("¡Letra guardada para esta canción!");
+            saveLibraryToLocalStorage();
+            alert("¡Letra guardada!");
         }
 
-        // --- CONTROL PANTALLA COMPLETA ---
         function openFullscreenPlayer() {
             if (currentIndex === -1) return;
             fsPlayer.classList.add('open');
